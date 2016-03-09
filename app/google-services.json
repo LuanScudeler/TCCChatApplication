@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_id": "chatup-d0935",
+    "project_number": "468641700472",
+    "name": "ChatUp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468641700472:android:4e2e685e91478586",
+        "client_id": "android:br.chatup.tcc",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "br.chatup.tcc",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "468641700472-jmg8fip30ne6c0gqu7v47lre9vaoq0ac.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.chatup.tcc",
+            "certificate_hash": "707EEB19B3F00C06C73D105D6FDD1F58C53B8C32"
+          }
+        },
+        {
+          "client_id": "468641700472-o1tgvg8dfpd0uurlc20ci8p63jt2g6rj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
