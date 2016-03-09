@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import br.chatup.tcc.bean.User;
+import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.JsonParser;
 
@@ -102,7 +103,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_exit) {
+            CacheStorage.removeAllCache(this);
+            Intent i = new Intent(this, GlobalActivity.class);
+            startActivity(i);
+            finish();
             return true;
         }
 

@@ -1,4 +1,8 @@
 <resources>
+
+    <!-- oauth -->
+    <string name="servr_client_id">468641700472-tnritscfo840jcce0qd43qorbl192se5.apps.googleusercontent.com</string>
+
     <string name="app_name">ChatUp</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -10,4 +14,7 @@
     <string name="login">Login</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+
+    <!-- MainActivity -->
+    <string name="exit">Exit</string>
 </resources>

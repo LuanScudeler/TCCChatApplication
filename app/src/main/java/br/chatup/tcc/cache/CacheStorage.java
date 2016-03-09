@@ -5,9 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -24,17 +21,27 @@ import br.chatup.tcc.utils.JsonParser;
  */
 public class CacheStorage {
 
-    private static final String DEF_CACHE_FILE = "usr_cache.json";
+    private static final String DEF_CACHE_FILE_USER_INFO = "usr_cache.json";
+    private static final String DEF_CACHE_FILE_USER_PHOTO = "usr_photo.json";
     private static final String DEF_CACHE_DIR = "cache";
 
     private static final String TAG = CacheStorage.class.getName();
+
+    public static void removeAllCache(Activity activity) {
+        File path = activity.getDir(String.format("%s", DEF_CACHE_DIR), Context.MODE_PRIVATE);
+
+        File cacheFile = new File(path.getAbsolutePath() + "/" + DEF_CACHE_FILE_USER_INFO);
+
+        if(cacheFile.exists())
+            cacheFile.delete();
+    }
 
 
     public static void storeUserInfo(User user, Activity activity) throws IOException, FileNotFoundException {
 
         File path = activity.getDir(String.format("%s", DEF_CACHE_DIR), Context.MODE_APPEND);
 
-        File cacheFile = new File(path.getAbsolutePath() + "/" + DEF_CACHE_FILE);
+        File cacheFile = new File(path.getAbsolutePath() + "/" + DEF_CACHE_FILE_USER_INFO);
 
         String json;
         json = JsonParser.toJson(user);
@@ -65,7 +72,7 @@ public class CacheStorage {
 
         File path = activity.getDir(String.format("%s", DEF_CACHE_DIR), Context.MODE_APPEND);
 
-        File cacheFile = new File(path.getAbsolutePath() + "/" + DEF_CACHE_FILE);
+        File cacheFile = new File(path.getAbsolutePath() + "/" + DEF_CACHE_FILE_USER_INFO);
 
         DataInputStream dis;
 
