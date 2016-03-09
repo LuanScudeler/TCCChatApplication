@@ -17,4 +17,5 @@
 
     <!-- MainActivity -->
     <string name="exit">Exit</string>
+    <string name="backup">Backup</string>
 </resources>
