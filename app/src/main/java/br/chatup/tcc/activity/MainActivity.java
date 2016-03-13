@@ -23,6 +23,7 @@ import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.JsonParser;
+import br.chatup.tcc.xmpp.XmppManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -132,8 +133,10 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-            Log.d("LOGOUT:", "TRIGGED");
+            Log.d("CHATUP-LOG:", "TRIGGED");
             CacheStorage.removeAllCache(this);
+            XmppManager.closeConnection();
+
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);
             finish();

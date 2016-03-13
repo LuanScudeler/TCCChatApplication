@@ -1,15 +1,25 @@
 package br.chatup.tcc.xmpp;
 
+import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.Manager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketIDFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -24,7 +34,7 @@ public class XmppManager {
 
     private String server;
     private int port;
-    private AbstractXMPPConnection conn = null;
+    static private AbstractXMPPConnection conn = null;
 
     public XmppManager(String server, int port) {
         this.server = server;
@@ -47,7 +57,7 @@ public class XmppManager {
         ConnectionListener connectionListener = new ConnectionListener() {
             @Override
             public void connected(XMPPConnection connection) {
-                Log.d("CONNECTION STATUS: ", "OPENED");
+                Log.d("CHATUP-CONN: ", "OPENED");
             }
 
             @Override
@@ -57,7 +67,7 @@ public class XmppManager {
 
             @Override
             public void connectionClosed() {
-                Log.d("CONNECTION STATUS: ", "CLOSED");
+                Log.d("CHATUP-CONN: ", "CLOSED");
             }
 
             @Override
@@ -83,23 +93,51 @@ public class XmppManager {
 
         conn.addConnectionListener(connectionListener);
 
-        try {
-            conn.connect();
-        } catch (SmackException e) {
-            e.printStackTrace();
-            Log.d("DEU RUIM:", "CONEXAO COM SERVIDOR");
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        OpenConnection task = new OpenConnection();
+        task.execute();
+    }
+
+    private class OpenConnection extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (conn.isConnected())
+                return false;
+
+
+            try {
+                conn.connect();
+            } catch (SmackException e) {
+                e.printStackTrace();
+                Log.d("CHATUP-CONN:", "CONEXAO COM SERVIDOR FALHOU");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.d("CHATUP-CONN:", "EXECUTING CONNECTION");
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
         }
     }
 
-    public void closeConnection(){
+    static public void closeConnection() {
         conn.disconnect();
     }
 
-    public void login(String acc, String pass){
+    public boolean login(String acc, String pass){
         if (conn == null){
-            Log.d("STATUS:", "CONNECTION NULL");
+            Log.d("CHATUP-CONN:", "CONNECTION NULL");
+            return false;
         }
         try {
             conn.login(acc, pass);
@@ -110,5 +148,18 @@ public class XmppManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return true;
+    }
+
+    private boolean createAccount(String username, String password) {
+
+        if (!conn.isConnected()){
+            OpenConnection task = new OpenConnection();
+            task.execute();
+        }
+
+        //TODO: Tem duas classes do smack AccountManager e Registration as duas tão deprecada, talvez precise fazer via http
+        return true;
     }
 }
