@@ -12,7 +12,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -23,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:ems="10"
-                android:id="@+id/edtEmail"
+                android:id="@+id/edtEmailLogin"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="56dp"
@@ -34,8 +35,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:ems="10"
-                android:id="@+id/edtPassword"
-                android:layout_below="@+id/edtEmail"
+                android:id="@+id/edtPasswordLogin"
+                android:layout_below="@+id/edtEmailLogin"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="41dp"
                 android:hint="@string/password" />
@@ -46,7 +47,7 @@
                 android:text="@string/login"
                 android:id="@+id/btnLogin"
                 android:layout_marginTop="61dp"
-                android:layout_below="@+id/edtPassword"
+                android:layout_below="@+id/edtPasswordLogin"
                 android:layout_alignParentStart="true"
                 android:background="@color/colorPrimary"
                 android:textColor="@color/white"
@@ -54,7 +55,23 @@
                 android:textSize="25dp"
                 android:onClick="btnLoginClick"/>
 
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="70dp"
+                android:text="@string/register"
+                android:id="@+id/btnRegister"
+                android:background="@color/colorPrimaryDark"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="25dp"
+                android:onClick="btnRegisterClick"
+                android:layout_below="@+id/btnLogin"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="50dp" />
+
         </RelativeLayout>
 
     </ScrollView>
+
 </RelativeLayout>

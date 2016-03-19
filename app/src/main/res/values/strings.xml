@@ -10,12 +10,31 @@
 
     <string name="action_settings">Settings</string>
 
+    <!-- Globals -->
+    <string name="conn_to_srv">Connecting...</string>
+    <string name="submit">Submit</string>
+
     <!-- LoginActivity -->
     <string name="login">Login</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="please_type_email_pass">Please type your email and password</string>
+    <string name="conn_fin">Connection finished</string>
+    <string name="signup">Sign Up</string>
+    <string name="welcome">Welcome!</string>
+    <string name="register">Register</string>
 
     <!-- MainActivity -->
     <string name="exit">Exit</string>
     <string name="backup">Backup</string>
+
+    <!-- RegisterActivity -->
+    <string name="sorry">Sorry! An error occured, check your internet connection and try again</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="name">Name</string>
+    <string name="username">Username</string>
+    <string name="new_user">New User</string>
+    <string name="all_fields_are_required">All fields are required</string>
+    <string name="password_dont_match">Password do not match</string>
+    <string name="user_registered_successfully">User registered successfully!</string>
 </resources>
