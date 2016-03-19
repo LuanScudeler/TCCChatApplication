@@ -17,7 +17,7 @@ public class JsonParser {
         return gson.fromJson(json, clazz);
     }
 
-    public static <T> String toJson(User obj) {
+    public static <T> String toJson(Object obj) {
         return gson.toJson(obj);
     }
 
