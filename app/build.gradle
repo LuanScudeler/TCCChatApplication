@@ -37,13 +37,16 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:design:22.2.0'
+    // Google Gson
     compile 'com.google.code.gson:gson:2.3.1'
+    // Smack API
     compile 'org.igniterealtime.smack:smack-core:4.1.6'
     compile 'org.igniterealtime.smack:smack-tcp:4.1.6'
-    compile 'org.igniterealtime.smack:smackx:3.2.1'
-
+    compile "org.igniterealtime.smack:smack-experimental:4.1.6"
+    compile 'org.igniterealtime.smack:smack-android:4.1.6'
+    compile "org.igniterealtime.smack:smack-android-extensions:4.1.6"
+    // Spring Android
     compile 'org.springframework.android:spring-android-rest-template:2.0.0.M3'
-
 
 }
 

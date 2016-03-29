@@ -29,14 +29,13 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private User user;
+    String userJson;
     private TextView txtHelloUser;
     private ImageView imgViewUserPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        String userJson = null;
-        User user = null;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity
             user = JsonParser.fromJson(User.class, userJson);
         }
 
-        txtHelloUser.setText(String.format("Welcome %s", user.getName()));
+        txtHelloUser.setText(String.format("Welcome %s", user.getUsername()));
 
         imgViewUserPhoto = (ImageView) findViewById(R.id.imgViewUserPhoto);
 
@@ -103,8 +102,16 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_exit) {
-            CacheStorage.removeAllCache(this);
+        if (id == R.id.actionExitMain) {
+            //CacheStorage.removeAllCache(this, user.getUsername());
+            CacheStorage.desactiveUsers(this);
+            Intent i = new Intent(this, GlobalActivity.class);
+            startActivity(i);
+            finish();
+            return true;
+        }
+        else if(id == R.id.actionClearAllMain) {
+            CacheStorage.removeAllCache(this, user.getUsername());
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);
             finish();
@@ -134,8 +141,9 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             Log.d("CHATUP-LOG:", "TRIGGED");
-            CacheStorage.removeAllCache(this);
-            XmppManager.closeConnection();
+            //CacheStorage.removeAllCache(this, user.getUsername());
+            CacheStorage.desactiveUsers(this);
+            //XmppManager.closeConnection();
 
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);

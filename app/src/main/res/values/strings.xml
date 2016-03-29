@@ -5,6 +5,8 @@
 
     <string name="app_name">ChatUp</string>
 
+    <string name="clear_all">Clear all user info</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -13,6 +15,7 @@
     <!-- Globals -->
     <string name="conn_to_srv">Connecting...</string>
     <string name="submit">Submit</string>
+    <string name="wait">Wait...</string>
 
     <!-- LoginActivity -->
     <string name="login">Login</string>

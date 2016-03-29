@@ -7,11 +7,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.springframework.http.HttpStatus;
+
+import java.io.IOException;
+
 import br.chatup.tcc.async.AsyncTaskListener;
-import br.chatup.tcc.async.RegisterTask;
+import br.chatup.tcc.async.http.RegisterTask;
 import br.chatup.tcc.bean.User;
+import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
-import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.JsonParser;
 
 public class RegisterActivity extends AppCompatActivity implements AsyncTaskListener {
@@ -23,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity implements AsyncTaskList
     private EditText edtEmail;
     private EditText edtPassword;
     private EditText edtRepeatPassword;
+    private User user;
 
 
     @Override
@@ -55,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity implements AsyncTaskList
             email = edtEmail.getText().toString();
             password = edtPassword.getText().toString();
 
-            User user = new User(username, password, name, email);
+            user = new User(username, password, name, email);
 
             userJson = JsonParser.toJson(user);
 
@@ -98,12 +103,17 @@ public class RegisterActivity extends AppCompatActivity implements AsyncTaskList
     }
 
     @Override
-    public void onTaskCompleted(Object result) {
+    public void onTaskCompleted(Object result, Object caller) {
 
-        String res = (String) result;
-
-        if(res.equals(Constants.HTTP_SUCCESS_CODE)) {
+        if( ((HttpStatus) result).equals(HttpStatus.CREATED) ) {
             Toast.makeText(this, this.getResources().getString(R.string.user_registered_successfully), Toast.LENGTH_SHORT).show();
+
+            try {
+                CacheStorage.storeUserInfo(user, this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);
             finish();

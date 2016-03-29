@@ -1,0 +1,43 @@
+<resources>
+
+    <!-- oauth -->
+    <string name="servr_client_id">468641700472-tnritscfo840jcce0qd43qorbl192se5.apps.googleusercontent.com</string>
+
+    <string name="app_name">ChatUp</string>
+
+    <string name="clear_all">Limpar todos as informações de usuário</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Configurações</string>
+
+    <!-- Globals -->
+    <string name="conn_to_srv">Conectando...</string>
+    <string name="submit">Confirmar</string>
+    <string name="wait">Aguarde...</string>
+
+    <!-- LoginActivity -->
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Senha</string>
+    <string name="please_type_email_pass">Por favor, digite seu usuário e senha</string>
+    <string name="conn_fin">Conexão finalizada</string>
+    <string name="signup">Cadastrar-se</string>
+    <string name="welcome">Bem vindo!</string>
+    <string name="register">Registrar</string>
+
+    <!-- MainActivity -->
+    <string name="exit">Sair</string>
+    <string name="backup">Backup</string>
+
+    <!-- RegisterActivity -->
+    <string name="sorry">Desculpe! Um erro ocorreu, verifique sua conexão com a internet e tente novamente</string>
+    <string name="repeat_password">Repita a senha</string>
+    <string name="name">Nome</string>
+    <string name="username">Nome de usuário</string>
+    <string name="new_user">Novo Usuário</string>
+    <string name="all_fields_are_required">Todos os campos são obrigatórios</string>
+    <string name="password_dont_match">Senhas não conferem</string>
+    <string name="user_registered_successfully">Usuário registrado com sucesso!</string>
+</resources>

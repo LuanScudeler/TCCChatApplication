@@ -1,0 +1,64 @@
+package br.chatup.tcc.async.http;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import br.chatup.tcc.async.AsyncTaskListener;
+import br.chatup.tcc.myapplication.R;
+import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.RestFacade;
+
+/**
+ * Created by jadson on 3/16/16.
+ */
+public class RegisterTask extends AsyncTask<String, String, String> {
+
+    private ProgressDialog pDialog;
+    private Context context;
+    private AsyncTaskListener listener;
+    private static final String TAG = Constants.CHATUP_PREFIX_TAG + RegisterTask.class.getSimpleName();
+
+    public RegisterTask(Context context, AsyncTaskListener listener) {
+        this.context = context;
+        this.listener = listener;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        pDialog = new ProgressDialog(context);
+        String message = context.getString(R.string.wait);
+        pDialog.setMessage(message);
+        pDialog.show();
+    }
+
+    @Override
+    protected String doInBackground(String... params) {
+
+        Log.i(TAG,
+                String.format("doInBackground: Initiating connection to register new user (%s) to server address %s",
+                        params[0],
+                        Constants.FULL_SERVER_ADDR));
+
+        String response = RestFacade.post(Constants.FULL_SERVER_ADDR, params[0]);
+
+        Log.i(TAG, "doInBackground: Response Status: " + response);
+
+        return response;
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        pDialog.cancel();
+        listener.onTaskCompleted(s, this);
+    }
+}
