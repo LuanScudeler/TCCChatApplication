@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="br.chatup.tcc.activity.LoginActivity"
-    android:background="@color/white">
+    android:background="@drawable/background">
 
     <ScrollView
         android:layout_width="match_parent"

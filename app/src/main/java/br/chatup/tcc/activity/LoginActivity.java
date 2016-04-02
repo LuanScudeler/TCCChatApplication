@@ -76,11 +76,8 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
         }
         else {
 
-            /*XMPPLoginTask xmppTask = new XMPPLoginTask(this, this);
-            xmppTask.execute(user);*/
-
-            SearchUserTask sut = new SearchUserTask(this, this);
-            sut.execute(username);
+            XMPPLoginTask xmppTask = new XMPPLoginTask(this, this);
+            xmppTask.execute(user);
 
             /*Intent i = new Intent(this, GlobalActivity.class);
 

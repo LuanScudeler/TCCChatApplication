@@ -60,51 +60,13 @@ public class RestFacade {
 
     }
 
-    public static String post(String url, String jsonData) {
+    public static HttpStatus post(String url, String jsonData) {
 
-        URL urlSrv = null;
-        HttpURLConnection httpConn = null;
-        DataInputStream in = null;
-        DataOutputStream out = null;
-
-        try {
-            urlSrv = new URL(url);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            //TODO throw e
-        }
-
-        try {
-            httpConn = (HttpURLConnection) urlSrv.openConnection();
-            httpConn.setDoOutput(true);
-            httpConn.setChunkedStreamingMode(0);
-            httpConn.setRequestProperty("Authorization", basicAuth);
-            httpConn.setRequestProperty("Content-Type", APPLICATION_JSON);
-            httpConn.setRequestProperty("Accept", APPLICATION_JSON);
-            httpConn.setRequestMethod(POST);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            //TODO throw e
-        }
-
-        try {
-            out = new DataOutputStream(httpConn.getOutputStream());
-            out.writeUTF(jsonData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            in = new DataInputStream(httpConn.getInputStream());
-            return in.readUTF();
-        } catch (Exception e) {
-            //TODO
-        } finally {
-            httpConn.disconnect();
-        }
-
-        return null;
+        return restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                buildHttpEntityWithParams(jsonData),
+                String.class).getStatusCode();
 
     }
 

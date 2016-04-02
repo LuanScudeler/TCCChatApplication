@@ -1,11 +1,13 @@
 <resources>
 
+
     <!-- oauth -->
     <string name="servr_client_id">468641700472-tnritscfo840jcce0qd43qorbl192se5.apps.googleusercontent.com</string>
 
     <string name="app_name">ChatUp</string>
 
     <string name="clear_all">Clear all user info</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

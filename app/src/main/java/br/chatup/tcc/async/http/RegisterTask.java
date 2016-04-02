@@ -21,7 +21,7 @@ import br.chatup.tcc.utils.RestFacade;
 /**
  * Created by jadson on 3/16/16.
  */
-public class RegisterTask extends AsyncTask<String, String, String> {
+public class RegisterTask extends AsyncTask<String, Void, HttpStatus> {
 
     private ProgressDialog pDialog;
     private Context context;
@@ -42,22 +42,22 @@ public class RegisterTask extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected HttpStatus doInBackground(String... params) {
 
         Log.i(TAG,
                 String.format("doInBackground: Initiating connection to register new user (%s) to server address %s",
                         params[0],
                         Constants.FULL_SERVER_ADDR));
 
-        String response = RestFacade.post(Constants.FULL_SERVER_ADDR, params[0]);
+        HttpStatus status = RestFacade.post(Constants.FULL_SERVER_ADDR, params[0]);
 
-        Log.i(TAG, "doInBackground: Response Status: " + response);
+        Log.i(TAG, "doInBackground: Response Status: " + status.toString());
 
-        return response;
+        return status;
     }
 
     @Override
-    protected void onPostExecute(String s) {
+    protected void onPostExecute(HttpStatus s) {
         pDialog.cancel();
         listener.onTaskCompleted(s, this);
     }

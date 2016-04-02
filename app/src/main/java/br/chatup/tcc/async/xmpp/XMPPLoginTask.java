@@ -7,8 +7,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.sasl.SASLMechanism;
+import org.jivesoftware.smack.sasl.provided.SASLDigestMD5Mechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.springframework.http.ResponseEntity;
@@ -56,13 +59,16 @@ public class XMPPLoginTask extends AsyncTask<User, Void, OperationStatus> {
         XMPPTCPConnectionConfiguration configuration = XMPPTCPConnectionConfiguration.builder()
                 .setHost(Constants.XMPP_SERVER_IP)
                 .setServiceName(Constants.XMPP_SERVER_IP)
-                .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
+                .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
                 .setSendPresence(true)
                 .build();
 
+       /* SASLMechanism mechanism = new SASLDigestMD5Mechanism();
+        SASLAuthentication.registerSASLMechanism(mechanism);
+        SASLAuthentication.blacklistSASLMechanism("SCRAM-SHA-1");
+        SASLAuthentication.unBlacklistSASLMechanism("DIGEST-MD5");*/
+
         XMPPTCPConnection connection = new XMPPTCPConnection(configuration);
-
-
 
         try {
             connection.connect();
