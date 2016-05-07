@@ -8,8 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.springframework.http.ResponseEntity;
-
 import br.chatup.tcc.async.AsyncTaskListener;
 import br.chatup.tcc.async.http.RegisterTask;
 import br.chatup.tcc.async.http.SearchUserTask;
@@ -27,12 +25,12 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
     private Button btnLogin;
     private XmppManager xmppManager;
 
-    private static final String TAG = Constants.CHATUP_PREFIX_TAG + LoginActivity.class.getSimpleName();
+    private static final String TAG = Constants.LOG_TAG + LoginActivity.class.getSimpleName();
 
     @Override
     public void onTaskCompleted(Object result, Object caller) {
 
-        //TODO XGH logic
+        //TODO XGH logic -- XGH in progress...
 
         if(caller instanceof RegisterTask) {
             if( (OperationStatus) result == OperationStatus.ERROR ){
@@ -44,6 +42,20 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
         }
         else if(caller instanceof SearchUserTask) {
             Toast.makeText(this, (String) result, Toast.LENGTH_SHORT).show();
+        }
+        else if (caller instanceof XMPPLoginTask) {
+            if( (OperationStatus) result == OperationStatus.ERROR ){
+                Toast.makeText(this, "Login Error =/", Toast.LENGTH_SHORT).show();
+            }
+            else if((OperationStatus) result == OperationStatus.SUCESS ) {
+                Toast.makeText(this, "Login Successfull =)", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, MainActivity.class);
+                Bundle b = new Bundle();
+                b.putString("user","{\"username\": \"Gambeta Monstra\"}"); //TODO: Find a way to pass current user instance through onTaskCompleted
+                i.putExtras(b);
+                startActivity(i);
+                finish();
+            }
         }
     }
 
@@ -75,7 +87,6 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
             Toast.makeText(this, advice, Toast.LENGTH_SHORT).show();
         }
         else {
-
             XMPPLoginTask xmppTask = new XMPPLoginTask(this, this);
             xmppTask.execute(user);
 
@@ -92,6 +103,4 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
             finish();*/
         }
     }
-
-
 }

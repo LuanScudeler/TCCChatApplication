@@ -22,6 +22,7 @@ import android.widget.TextView;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
+import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.xmpp.XmppManager;
 
@@ -29,14 +30,13 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private User user;
-    String userJson;
+    private String userJson;
     private TextView txtHelloUser;
     private ImageView imgViewUserPhoto;
+    private static final String TAG = Constants.LOG_TAG + MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.actionExitMain) {
+            //TODO: Logout already implemented in Side Navagation Bar
             //CacheStorage.removeAllCache(this, user.getUsername());
             CacheStorage.desactiveUsers(this);
             Intent i = new Intent(this, GlobalActivity.class);
@@ -140,10 +141,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-            Log.d("CHATUP-LOG:", "TRIGGED");
-            //CacheStorage.removeAllCache(this, user.getUsername());
+            Log.d(TAG, "LOGOUT TRIGGED");
             CacheStorage.desactiveUsers(this);
-            //XmppManager.closeConnection();
+            XmppManager.closeConnection();
 
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);

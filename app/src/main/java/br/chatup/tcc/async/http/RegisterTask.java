@@ -5,13 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import br.chatup.tcc.async.AsyncTaskListener;
 import br.chatup.tcc.myapplication.R;
@@ -26,7 +20,7 @@ public class RegisterTask extends AsyncTask<String, Void, HttpStatus> {
     private ProgressDialog pDialog;
     private Context context;
     private AsyncTaskListener listener;
-    private static final String TAG = Constants.CHATUP_PREFIX_TAG + RegisterTask.class.getSimpleName();
+    private static final String TAG = Constants.LOG_TAG + RegisterTask.class.getSimpleName();
 
     public RegisterTask(Context context, AsyncTaskListener listener) {
         this.context = context;

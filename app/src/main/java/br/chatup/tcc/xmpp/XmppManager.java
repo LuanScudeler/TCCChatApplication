@@ -14,39 +14,35 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
+import br.chatup.tcc.utils.Constants;
+
 /**
  * Created by Luan on 3/12/2016.
  */
 public class XmppManager {
 
-    private static final int packetReplyTimeout = 500; // millis
+    static private XMPPTCPConnection conn = null;
+    private static final Integer REPLAY_TIMEOUT = 10000;
+    private static final String TAG = Constants.LOG_TAG + XmppManager.class.getSimpleName();
 
-    private String server;
-    private int port;
-    static private AbstractXMPPConnection conn = null;
+    public XMPPTCPConnection initConnection() throws XMPPException, IOException, SmackException {
 
-    public XmppManager(String server, int port) {
-        this.server = server;
-        this.port = port;
-    }
+        XMPPTCPConnectionConfiguration configuration = XMPPTCPConnectionConfiguration.builder()
+                .setHost(Constants.XMPP_SERVER_IP)
+                .setPort(Constants.XMPP_SERVER_PORT)
+                .setServiceName(Constants.XMPP_SERVER_IP)
+                .setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled)
+                .setSendPresence(true)
+                .setDebuggerEnabled(true)
+                .build();
 
-    public void initConnection() throws XMPPException {
-
-        System.out.println(String.format("Initializing connection to server %1$s port %2$d", server, port));
-
-        XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
-
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setServiceName(server);
-        config.setHost(server);
-        config.setPort(5222);
-        config.setDebuggerEnabled(true);
-        conn = new XMPPTCPConnection(config.build());
+        conn = new XMPPTCPConnection(configuration);
+        conn.setPacketReplyTimeout(REPLAY_TIMEOUT);
 
         ConnectionListener connectionListener = new ConnectionListener() {
             @Override
             public void connected(XMPPConnection connection) {
-                Log.d("CHATUP-CONN: ", "OPENED");
+                Log.d(TAG, "CONN OPENED");
             }
 
             @Override
@@ -56,7 +52,7 @@ public class XmppManager {
 
             @Override
             public void connectionClosed() {
-                Log.d("CHATUP-CONN: ", "CLOSED");
+                Log.d(TAG, "CONN CLOSED");
             }
 
             @Override
@@ -81,10 +77,9 @@ public class XmppManager {
         };
 
         conn.addConnectionListener(connectionListener);
+        conn.connect();
 
-
-        OpenConnection task = new OpenConnection();
-        task.execute();
+        return conn;
     }
 
     private class OpenConnection extends AsyncTask<Void, Void, Boolean> {
@@ -94,12 +89,11 @@ public class XmppManager {
             if (conn.isConnected())
                 return false;
 
-
             try {
                 conn.connect();
             } catch (SmackException e) {
                 e.printStackTrace();
-                Log.d("CHATUP-CONN:", "CONEXAO COM SERVIDOR FALHOU");
+                Log.d(TAG, "CONN FAILED");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (XMPPException e) {
@@ -110,7 +104,7 @@ public class XmppManager {
 
         @Override
         protected void onPreExecute() {
-            Log.d("CHATUP-CONN:", "EXECUTING CONNECTION");
+            Log.d(TAG, "CONNECTING...");
         }
 
         @Override
@@ -121,34 +115,5 @@ public class XmppManager {
 
     static public void closeConnection() {
         conn.disconnect();
-    }
-
-    public boolean login(String acc, String pass){
-        if (conn == null){
-            Log.d("CHATUP-CONN:", "CONNECTION NULL");
-            return false;
-        }
-        try {
-            conn.login(acc, pass);
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return true;
-    }
-
-    private boolean createAccount(String username, String password) {
-
-        if (!conn.isConnected()){
-            OpenConnection task = new OpenConnection();
-            task.execute();
-        }
-
-        //TODO: Tem duas classes do smack AccountManager e Registration as duas tão deprecada, talvez precise fazer via http
-        return true;
     }
 }

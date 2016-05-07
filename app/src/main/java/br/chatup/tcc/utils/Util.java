@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 public class Util {
 
     public static String getTagForClass(Class clazz) {
-        return Constants.CHATUP_PREFIX_TAG + clazz.getClass().getSimpleName();
+        return Constants.LOG_TAG + clazz.getClass().getSimpleName();
     }
 
     public static String parseByteArrayToStr(byte[] bytes) {

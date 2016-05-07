@@ -14,7 +14,7 @@ import br.chatup.tcc.utils.JsonParser;
 
 public class GlobalActivity extends AppCompatActivity {
 
-    private static final String TAG = Constants.CHATUP_PREFIX_TAG + GlobalActivity.class.getSimpleName();
+    private static final String TAG = Constants.LOG_TAG + GlobalActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +25,6 @@ public class GlobalActivity extends AppCompatActivity {
         Intent i;
 
         try {
-
             username = CacheStorage.getActiveUser(this);
 
             if(username != null) {
@@ -36,18 +35,13 @@ public class GlobalActivity extends AppCompatActivity {
                     finish();
                 }
                 else {
-
                     i = new Intent(this, MainActivity.class);
-
-                    Bundle b = new Bundle();
                     String json = JsonParser.toJson(usr);
 
+                    Bundle b = new Bundle();
                     b.putString("user",json);
-
                     i.putExtras(b);
-
                     startActivity(i);
-
                     finish();
                 }
             } else {
