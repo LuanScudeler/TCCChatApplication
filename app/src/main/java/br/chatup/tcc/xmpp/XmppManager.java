@@ -6,14 +6,19 @@ import android.util.Log;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.sasl.SASLMechanism;
+import org.jivesoftware.smack.sasl.provided.SASLDigestMD5Mechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
+import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.utils.Constants;
 
 /**
@@ -47,7 +52,9 @@ public class XmppManager {
 
             @Override
             public void authenticated(XMPPConnection connection, boolean resumed) {
-
+                Log.d(TAG, "AUTHENTICATED!");
+                // Chat listener created after user authentication, so user is ready to listen to incoming messages
+                ChatManager.getInstanceFor(connection).addChatListener(new ChatListener());
             }
 
             @Override
@@ -113,7 +120,9 @@ public class XmppManager {
         }
     }
 
-    static public void closeConnection() {
+    public static void closeConnection() {
         conn.disconnect();
     }
+
+    public static XMPPTCPConnection getConn(){ return conn; }
 }

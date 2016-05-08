@@ -1,7 +1,6 @@
 package br.chatup.tcc.activity;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -138,8 +137,11 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_chat) {
+            Log.d(TAG, "CHAT TRIGGED");
+            Intent i = new Intent(this, ChatActivity.class);
+            startActivity(i);
+            finish();
         } else if (id == R.id.nav_logout) {
             Log.d(TAG, "LOGOUT TRIGGED");
             CacheStorage.desactiveUsers(this);
