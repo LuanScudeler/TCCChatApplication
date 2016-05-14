@@ -2,6 +2,7 @@ package br.chatup.tcc.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -39,10 +40,10 @@ public class ChatActivity extends AppCompatActivity {
 
     public void sendMessage(){
         ChatManager chatmanager = ChatManager.getInstanceFor(XmppManager.getConn());
-        //Change  "luanpc" for your xmpp.domain value. Can be found in openfire at Server Manager > System Properties
-        //TODO: No need to create new instance of MessageListener if user has received the first message. Because ChatListener already create a MessageListener to the chat
+        //For tests: change "luanpc" for your xmpp.domain value. Can be found in openfire at Server Manager > System Properties
+        //TODO: Share instances of chatListener, messageListner and chatExists(true or false) through the entire application, in order to manage chats
         Chat newChat = chatmanager.createChat("username1@luanpc", new br.chatup.tcc.chat.MessageListener());
-
+        Log.d(TAG, "CHAT CREATED - ThreadID: "+newChat.getThreadID()+" Listener: "+newChat.getListeners().toString());
         try {
             newChat.sendMessage("A mizeravi, acerto!");
         } catch (SmackException.NotConnectedException e) {

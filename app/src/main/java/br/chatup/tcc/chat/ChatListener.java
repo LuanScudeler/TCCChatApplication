@@ -21,8 +21,8 @@ public class ChatListener implements ChatManagerListener {
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
         if (!createdLocally)
-            Log.d(TAG, "Chat Listener trigged, chat instance created.");
             chat.addMessageListener(new MessageListener());
+            Log.d(TAG, "CHAT CREATED - ThreadID: " + chat.getThreadID() + " Listener: " + chat.getListeners().toString());
     }
 }
 
