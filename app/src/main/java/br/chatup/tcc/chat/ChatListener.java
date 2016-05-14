@@ -12,7 +12,7 @@ import br.chatup.tcc.utils.Constants;
  */
 public class ChatListener implements ChatManagerListener {
     /*
-    * Chat listener trigges when user receives incoming messages.
+    * Chat listener trigges when user receives incoming messages..
     * It adds a message listener to the chat to receive all future messages
     *
     * */

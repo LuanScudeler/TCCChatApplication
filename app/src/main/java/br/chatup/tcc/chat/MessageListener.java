@@ -11,7 +11,7 @@ import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.JsonParser;
 
 /**
- * Created by Luan on 5/8/2016.
+ * Created by Luan on 5/8/2016..
  */
 public class MessageListener implements ChatMessageListener {
 

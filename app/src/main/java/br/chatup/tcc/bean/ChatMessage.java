@@ -1,7 +1,7 @@
 package br.chatup.tcc.bean;
 
 /**
- * Created by Luan on 5/13/2016.
+ * Created by Luan on 5/13/2016..
  */
 public class ChatMessage {
 
