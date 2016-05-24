@@ -27,7 +27,7 @@ import br.chatup.tcc.utils.Constants;
 public class XmppManager {
 
     static private XMPPTCPConnection conn = null;
-    private static final Integer REPLAY_TIMEOUT = 10000;
+    private static final Integer REPLAY_TIMEOUT = 20000;
     private static final String TAG = Constants.LOG_TAG + XmppManager.class.getSimpleName();
 
     public XMPPTCPConnection initConnection() throws XMPPException, IOException, SmackException {

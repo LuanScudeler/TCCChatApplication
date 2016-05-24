@@ -18,7 +18,7 @@ import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.xmpp.XmppManager;
 
-public class LoginActivity extends AppCompatActivity implements AsyncTaskListener{
+public class LoginActivity extends AppCompatActivity {
 
     private EditText edtUsername;
     private EditText edtPassword;
@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
 
     private static final String TAG = Constants.LOG_TAG + LoginActivity.class.getSimpleName();
 
-    @Override
+    /*@Override
     public void onTaskCompleted(Object result, Object caller) {
 
         //TODO XGH logic -- XGH in progress...
@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
                 finish();
             }
         }
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements AsyncTaskListene
             Toast.makeText(this, advice, Toast.LENGTH_SHORT).show();
         }
         else {
-            XMPPLoginTask xmppTask = new XMPPLoginTask(this, this);
+            XMPPLoginTask xmppTask = new XMPPLoginTask(this);
             xmppTask.execute(user);
 
             /*Intent i = new Intent(this, GlobalActivity.class);

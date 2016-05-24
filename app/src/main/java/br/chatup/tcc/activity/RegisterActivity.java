@@ -114,6 +114,8 @@ public class RegisterActivity extends AppCompatActivity implements AsyncTaskList
                 e.printStackTrace();
             }
 
+
+
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);
             finish();

@@ -42,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
         ChatManager chatmanager = ChatManager.getInstanceFor(XmppManager.getConn());
         //For tests:: change "luanpc" for your xmpp.domain value. Can be found in openfire at Server Manager > System Properties
         //TODO: Share instances of chatListener, messageListner and chatExists(true or false) through the entire application, in order to manage chats
-        Chat newChat = chatmanager.createChat("username1@luanpc", new br.chatup.tcc.chat.MessageListener());
+        Chat newChat = chatmanager.createChat("luan@ap1102m04", new br.chatup.tcc.chat.MessageListener());
         Log.d(TAG, "CHAT CREATED - ThreadID: "+newChat.getThreadID()+" Listener: "+newChat.getListeners().toString());
         try {
             newChat.sendMessage("A mizeravi, acerto!");
