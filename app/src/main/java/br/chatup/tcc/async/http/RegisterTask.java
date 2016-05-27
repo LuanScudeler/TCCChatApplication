@@ -55,4 +55,6 @@ public class RegisterTask extends AsyncTask<String, Void, HttpStatus> {
         pDialog.cancel();
         listener.onTaskCompleted(s, this);
     }
+
+
 }

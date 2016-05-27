@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
@@ -17,11 +20,12 @@ import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.JsonParser;
+import br.chatup.tcc.xmpp.XmppManager;
 
 public class RegisterActivity extends AppCompatActivity implements AsyncTaskListener {
 
     private RegisterTask rAsync;
-
+    private XMPPTCPConnection connection = null;
     private EditText edtName;
     private EditText edtUsername;
     private EditText edtEmail;
@@ -105,16 +109,21 @@ public class RegisterActivity extends AppCompatActivity implements AsyncTaskList
     @Override
     public void onTaskCompleted(Object result, Object caller) {
 
+        XmppManager xmppManager = new XmppManager();
+
         if( ((HttpStatus) result).equals(HttpStatus.CREATED) ) {
             Toast.makeText(this, this.getResources().getString(R.string.user_registered_successfully), Toast.LENGTH_SHORT).show();
 
             try {
                 CacheStorage.storeUserInfo(user, this);
+                connection = xmppManager.initConnection();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (SmackException e) {
+                e.printStackTrace();
+            } catch (XMPPException e) {
+                e.printStackTrace();
             }
-
-
 
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);

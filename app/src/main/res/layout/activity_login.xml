@@ -46,10 +46,10 @@
                 android:layout_height="70dp"
                 android:text="@string/login"
                 android:id="@+id/btnLogin"
+                android:background = "@drawable/roundedbutton"
                 android:layout_marginTop="61dp"
                 android:layout_below="@+id/edtPassword_Login"
                 android:layout_alignParentStart="true"
-                android:background="@color/colorPrimary"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:textSize="25dp"
@@ -61,14 +61,14 @@
                 android:layout_height="70dp"
                 android:text="@string/register"
                 android:id="@+id/btnRegister"
-                android:background="@color/colorPrimaryDark"
+                android:layout_marginTop="15dp"
+                android:background = "@drawable/roundedbutton_darker"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:textSize="25dp"
                 android:onClick="btnRegisterClick"
                 android:layout_below="@+id/btnLogin"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="50dp" />
+                android:layout_alignParentStart="true" />
 
         </RelativeLayout>
 

@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Login Successfull =)", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(this, MainActivity.class);
                 Bundle b = new Bundle();
-                b.putString("user","{\"username\": \"Gambeta Monstra\"}"); //TODO: Find a way to pass current user instance through onTaskCompleted or change implementation
+                b.putString("user","{\"username\": \"Gambeta Monstra\"}");
                 i.putExtras(b);
                 startActivity(i);
                 finish();

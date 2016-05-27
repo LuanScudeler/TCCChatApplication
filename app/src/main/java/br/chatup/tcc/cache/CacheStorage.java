@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -27,6 +29,8 @@ public class CacheStorage {
     private static final String CACHE_FILE_USER_PHOTO_SUFIX = "_photo.json";
     private static final String CURRENT_ACTIVE_USER_FILE = "active.json";
     private static final String CACHE_DIR = "cache";
+
+    private static HashMap<String, String> openChats = new HashMap<String, String>();;
 
     private static final String TAG = CacheStorage.class.getSimpleName();
 
@@ -217,6 +221,14 @@ public class CacheStorage {
     public static Bitmap getUserPhoto(Activity activity) {
         //TODO
         return null;
+    }
+
+    public static void addChatContact(String contactJID, String threadID){
+        openChats.put(contactJID, threadID);
+    }
+
+    public static HashMap<String, String> getInstanceCachedChats(){
+        return openChats;
     }
 
 }

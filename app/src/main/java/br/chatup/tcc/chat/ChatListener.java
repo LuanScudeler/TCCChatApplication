@@ -5,6 +5,7 @@ import android.util.Log;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 
+import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.utils.Constants;
 
 /**
@@ -20,9 +21,11 @@ public class ChatListener implements ChatManagerListener {
 
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
-        if (!createdLocally)
+        if (!createdLocally) {
             chat.addMessageListener(new MessageListener());
-            Log.d(TAG, "CHAT CREATED - ThreadID: " + chat.getThreadID() + " Listener: " + chat.getListeners().toString());
+            CacheStorage.addChatContact(chat.getParticipant(), chat.getThreadID());
+            Log.d(TAG, "CHAT CREATED - ADDING TO CACHE: " + "Contact: " + chat.getParticipant() + " ThreadID: " + chat.getThreadID());
+        }
     }
 }
 

@@ -19,13 +19,12 @@ public class MessageListener implements ChatMessageListener {
 
     @Override
     public void processMessage(Chat chat, Message message) {
-        Log.d(TAG, "MESSAGE RECEIVED:" + message.getBody() + " --- User: " + chat.getParticipant() + " --- ThreadID: " + chat.getThreadID());
+        Log.d(TAG, "MESSAGE RECEIVED --- Body: " + message.getBody() + " --- User: " + chat.getParticipant() + " --- ThreadID: " + chat.getThreadID());
 
         //Gets from who the message came from
         if (message.getType() == Message.Type.chat && message.getBody() != null) {
-            final ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setBody(message.getBody());
-            chatMessage.setReceiver(chat.getParticipant());
+            final ChatMessage chatMessage = new ChatMessage(message.getBody(), chat.getParticipant());
+            //TODO add these informations to a list of opened chats
         }
     }
 }

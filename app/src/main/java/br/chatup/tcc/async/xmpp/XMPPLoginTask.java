@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.sasl.SASLErrorException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -69,12 +70,16 @@ public class XMPPLoginTask extends AsyncTask<User, Void, User> {
             //TODO logar os erros
             Toast.makeText(activity, "Erro no login", Toast.LENGTH_SHORT).show();
             return null;
+        } catch (SASLErrorException e) {
+            Toast.makeText(activity, "Authentication Error. User may not exist", Toast.LENGTH_SHORT).show();
+            return null;
         } catch (XMPPException e) {
             Log.e(TAG, "doInBackground: ", e);
             Toast.makeText(activity, "Erro no login", Toast.LENGTH_SHORT).show();
             //TODO logar os erros
             return null;
         }
+
 
         return user;
     }
