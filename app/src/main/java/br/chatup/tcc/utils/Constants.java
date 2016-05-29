@@ -10,6 +10,7 @@ public class Constants {
     public static final int XMPP_SERVER_PORT_REGISTER = 9090;
     public static final String XMPP_SERVER_REGISTER_PATH = "/plugins/restapi/v1/users";
     public static final String LOG_TAG = "CHATUP-";
+    public static final String FULL_JID_APPEND = "/Smack";
     public static final String FULL_SERVER_ADDR = "http://" + Constants.XMPP_SERVER_IP
             .concat(":")
             .concat(String.valueOf(Constants.XMPP_SERVER_PORT_REGISTER))

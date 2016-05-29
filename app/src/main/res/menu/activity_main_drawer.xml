@@ -35,9 +35,9 @@
                 android:icon="@drawable/chat_icon"
                 android:title="Chat" />
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/nav_contacts"
+                android:icon="@drawable/contacts_list_icon"
+                android:title="Contacts" />
         </menu>
     </item>
 

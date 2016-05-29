@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.TextView;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
@@ -20,19 +20,27 @@ import br.chatup.tcc.xmpp.XmppManager;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private ImageButton btnSendMessage;
-    private EditText edtMessageBody;
     private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
+    private static final String FULL_JID_APPEND = Constants.FULL_JID_APPEND;
+    private EditText edtMessageBody;
+    private TextView tvContact;
     private Chat newChat;
+    private String contactJID;
+    private String contactFULL_JID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        btnSendMessage = (ImageButton) findViewById(R.id.btnSendMessage);
         edtMessageBody = (EditText) findViewById(R.id.edtMessage);
+        tvContact = (TextView) findViewById(R.id.tvContact);
 
+        contactJID = getIntent().getExtras().getString("contactJID").toString();
+        contactFULL_JID = contactJID.concat(FULL_JID_APPEND);
+
+        Log.d(TAG, "Opening chat with: " + contactFULL_JID);
+        tvContact.setText(contactJID);
     }
 
     public void btnSendMessageClick (View v) {
@@ -44,9 +52,10 @@ public class ChatActivity extends AppCompatActivity {
 
         //TODO receiver (exemplo "luan@luanpc") must come from list of contacts (when contact is selected to start a conversation or to reply a received message)
         if(!messageBody.equalsIgnoreCase("")){
-            final ChatMessage chatMessage = new ChatMessage(messageBody, "luan@luanpc");
+            final ChatMessage chatMessage = new ChatMessage(messageBody, contactFULL_JID);
             final Message message = new Message();
             ChatManager chatManager = ChatManager.getInstanceFor(XmppManager.getConn());
+            //Gets for whom the message will go for (retrieves a user JID)
             String messageReceiver = chatMessage.getReceiver();
 
             //For tests:: change "luanpc" for your xmpp.domain value. Can be found in openfire at Server Manager > System Properties
@@ -56,9 +65,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 Log.d(TAG, "CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + messageReceiver  + " ThreadID:"+ newChat.getThreadID());
             }else{
-                message.setThread(CacheStorage.getInstanceCachedChats().get("luan@luanpc").toString());
+                message.setThread(CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
 
-                Log.d(TAG, "CONTACT CHAT ALREADY OPEN: Setting threadID for reply: CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get("luan@luanpc").toString());
+                Log.d(TAG, "CONTACT CHAT ALREADY OPEN: Setting threadID for reply: CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
             }
 
             message.setBody(messageBody);

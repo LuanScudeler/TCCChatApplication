@@ -13,9 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.utils.JsonParser;
@@ -36,7 +33,7 @@ public class CacheStorage {
 
     public static void removeAllCache(Activity activity, String userName) {
 
-        romoveUserCacheInfo(activity, userName);
+        removeUserCacheInfo(activity, userName);
 
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
 
@@ -52,7 +49,7 @@ public class CacheStorage {
 
     }
 
-    public static void desactiveUsers(Activity activity) {
+    public static void deactivateUsers(Activity activity) {
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
 
         String activeUserFilePath = cacheDirPath.getAbsolutePath()
@@ -66,7 +63,7 @@ public class CacheStorage {
         }
     }
 
-    public static void romoveUserCacheInfo(Activity activity, String userName) {
+    public static void removeUserCacheInfo(Activity activity, String userName) {
 
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
 

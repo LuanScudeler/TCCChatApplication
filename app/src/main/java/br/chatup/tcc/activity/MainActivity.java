@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.actionExitMain) {
             //TODO: Logout already implemented in Side Navagation Bar
             //CacheStorage.removeAllCache(this, user.getUsername());
-            CacheStorage.desactiveUsers(this);
+            CacheStorage.deactivateUsers(this);
             Intent i = new Intent(this, GlobalActivity.class);
             startActivity(i);
             finish();
@@ -135,8 +135,10 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_contacts) {
+            Log.d(TAG, "CONTACS TRIGGED");
+            Intent i = new Intent(this, ContactsActivity.class);
+            startActivity(i);
         } else if (id == R.id.nav_chat) {
             Log.d(TAG, "CHAT TRIGGED");
             Intent i = new Intent(this, ChatActivity.class);
@@ -144,7 +146,7 @@ public class MainActivity extends AppCompatActivity
             finish();
         } else if (id == R.id.nav_logout) {
             Log.d(TAG, "LOGOUT TRIGGED");
-            CacheStorage.desactiveUsers(this);
+            //CacheStorage.deactivateUsers(this); -- Cache is now cleared on connection closure listener
             XmppManager.closeConnection();
 
             Intent i = new Intent(this, GlobalActivity.class);

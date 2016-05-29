@@ -1,5 +1,6 @@
 package br.chatup.tcc.xmpp;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -18,6 +19,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
+import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.utils.Constants;
 
@@ -26,9 +28,11 @@ import br.chatup.tcc.utils.Constants;
  */
 public class XmppManager {
 
+    private static final String TAG = Constants.LOG_TAG + XmppManager.class.getSimpleName();
+
     static private XMPPTCPConnection conn = null;
     private static final Integer REPLAY_TIMEOUT = 20000;
-    private static final String TAG = Constants.LOG_TAG + XmppManager.class.getSimpleName();
+    private Activity activity;
 
     public XMPPTCPConnection initConnection() throws XMPPException, IOException, SmackException {
 
@@ -59,7 +63,8 @@ public class XmppManager {
 
             @Override
             public void connectionClosed() {
-                Log.d(TAG, "CONN CLOSED");
+                Log.d(TAG, "CONN CLOSED, CLEANNING CACHE");
+                CacheStorage.deactivateUsers(activity);
             }
 
             @Override
