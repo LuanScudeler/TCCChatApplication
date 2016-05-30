@@ -22,9 +22,14 @@ public class ChatListener implements ChatManagerListener {
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
         if (!createdLocally) {
-            chat.addMessageListener(new MessageListener());
-            CacheStorage.addChatContact(chat.getParticipant(), chat.getThreadID());
-            Log.d(TAG, "CHAT CREATED - ADDING TO CACHE: " + "Contact: " + chat.getParticipant() + " ThreadID: " + chat.getThreadID());
+            //TODO cachedChats is already verified in ChatActivity when creating chat. This if() can probably be removed
+            if(!CacheStorage.getInstanceCachedChats().containsKey(chat.getParticipant())){
+                CacheStorage.addChatContact(chat.getParticipant(), chat.getThreadID());
+                chat.addMessageListener(new MessageListener());
+                Log.d(TAG, "CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + chat.getParticipant() + " ThreadID:" + chat.getThreadID());
+            }else{
+                Log.d(TAG, "CHAT ALREADY CREATED: " + "Contact: " + chat.getParticipant() + " ThreadID: " + CacheStorage.getInstanceCachedChats().get(chat.getParticipant()));
+            }
         }
     }
 }

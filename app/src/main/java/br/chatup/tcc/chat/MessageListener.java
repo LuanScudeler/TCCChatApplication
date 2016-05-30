@@ -25,6 +25,7 @@ public class MessageListener implements ChatMessageListener {
         if (message.getType() == Message.Type.chat && message.getBody() != null) {
             final ChatMessage chatMessage = new ChatMessage(message.getBody(), chat.getParticipant());
             //TODO add these informations to a list of opened chats
+            //TODO If this method is executed before the message is sent we can implement the translation process here
         }
     }
 }

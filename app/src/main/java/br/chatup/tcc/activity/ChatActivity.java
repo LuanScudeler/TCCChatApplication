@@ -50,7 +50,6 @@ public class ChatActivity extends AppCompatActivity {
     public void sendMessage(){
         String messageBody = edtMessageBody.getText().toString();
 
-        //TODO receiver (exemplo "luan@luanpc") must come from list of contacts (when contact is selected to start a conversation or to reply a received message)
         if(!messageBody.equalsIgnoreCase("")){
             final ChatMessage chatMessage = new ChatMessage(messageBody, contactFULL_JID);
             final Message message = new Message();
@@ -63,11 +62,14 @@ public class ChatActivity extends AppCompatActivity {
                 newChat = chatManager.createChat(messageReceiver, new br.chatup.tcc.chat.MessageListener());
                 CacheStorage.addChatContact(messageReceiver, newChat.getThreadID());
 
-                Log.d(TAG, "CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + messageReceiver  + " ThreadID:"+ newChat.getThreadID());
+                Log.d(TAG, "NEW CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + messageReceiver  + " ThreadID:"+ newChat.getThreadID());
             }else{
+                //Get chat threadID from cachedChats for the current contact that the user is chatting with
+                newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactFULL_JID));
+                //Set on message the chat threadID that already exist in the cachedChats
                 message.setThread(CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
 
-                Log.d(TAG, "CONTACT CHAT ALREADY OPEN: Setting threadID for reply: CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
+                Log.d(TAG, "CONTACT CHAT ALREADY OPEN: Setting threadID on message for reply: CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactFULL_JID));
             }
 
             message.setBody(messageBody);
