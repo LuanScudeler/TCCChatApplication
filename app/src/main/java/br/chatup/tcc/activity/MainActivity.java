@@ -127,23 +127,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_contacts) {
+        if (id == R.id.nav_contacts) {
             Log.d(TAG, "CONTACS TRIGGED");
             Intent i = new Intent(this, ContactsActivity.class);
             startActivity(i);
-        } else if (id == R.id.nav_chat) {
-            Log.d(TAG, "CHAT TRIGGED");
-            Intent i = new Intent(this, ChatActivity.class);
-            startActivity(i);
-            finish();
         } else if (id == R.id.nav_logout) {
             Log.d(TAG, "LOGOUT TRIGGED");
             //CacheStorage.deactivateUsers(this); -- Cache is now cleared on connection closure listener

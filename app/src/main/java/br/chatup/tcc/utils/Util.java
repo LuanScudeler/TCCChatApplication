@@ -16,4 +16,17 @@ public class Util {
         return str;
     }
 
+    public static String toCapital(String str) {
+        String cap = "";
+
+        for(int cont = 0; cont < str.length(); cont++) {
+            if(cont == 0)
+                cap += Character.toUpperCase(str.charAt(cont));
+            else
+                cap += str.charAt(cont);
+        }
+
+        return cap;
+    }
+
 }

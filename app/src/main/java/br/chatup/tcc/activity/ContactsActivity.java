@@ -48,9 +48,9 @@ public class ContactsActivity extends AppCompatActivity {
         startRosterPresenceListener(roster);
 
         //Add a roster to the current user for testing purposes
-        String userJID = "luan@luanpc";
-        String nickName = "Luan";
-        //addUserForTest(roster, userJID, nickName);
+        String userJID = "tester@192.168.0.100";
+        String nickName = "tester";
+        addUserForTest(roster, userJID, nickName);
 
         //Get all rosters
         Collection<RosterEntry> entries = roster.getEntries();
