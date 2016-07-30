@@ -1,19 +1,26 @@
 package br.chatup.tcc.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import br.chatup.tcc.async.AsyncTaskListener;
-import br.chatup.tcc.async.http.RegisterTask;
-import br.chatup.tcc.async.http.SearchUserTask;
-import br.chatup.tcc.async.xmpp.XMPPLoginTask;
-import br.chatup.tcc.bean.OperationStatus;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.sasl.SASLErrorException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+
+import java.io.IOException;
+
 import br.chatup.tcc.bean.User;
+import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.xmpp.XmppManager;
@@ -22,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText edtUsername;
     private EditText edtPassword;
+    private ProgressDialog pDialog;
     private Button btnLogin;
     private XmppManager xmppManager;
 
@@ -87,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, advice, Toast.LENGTH_SHORT).show();
         }
         else {
-            XMPPLoginTask xmppTask = new XMPPLoginTask(this);
+            XMPPLoginTask xmppTask = new XMPPLoginTask();
             xmppTask.execute(user);
 
             /*Intent i = new Intent(this, GlobalActivity.class);
@@ -103,4 +111,53 @@ public class LoginActivity extends AppCompatActivity {
             finish();*/
         }
     }
+    public class XMPPLoginTask extends AsyncTask<User, Void, User> {
+        private XMPPTCPConnection connection = null;
+        private User user;
+
+        @Override
+        protected void onPreExecute() {
+            pDialog = new ProgressDialog(LoginActivity.this);
+            pDialog.setMessage(getResources().getString(R.string.conn_to_srv));
+            pDialog.show();
+        }
+
+        @Override
+        protected User doInBackground(User... params) {
+
+            XmppManager xmppManager = new XmppManager();
+
+            try {
+                connection = xmppManager.initConnection();
+                connection.login(params[0].getUsername(), params[0].getPassword());
+                user = params[0];
+            }
+            catch(Exception ex) {
+                Log.e(TAG, "doInBackground: ", ex);
+                user = null;
+            }
+            return user;
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            pDialog.cancel();
+
+            if(user != null) {
+                try {
+                    CacheStorage.storeUserInfo(user, LoginActivity.this);
+                    Intent i = new Intent(LoginActivity.this, GlobalActivity.class);
+                    startActivity(i);
+                    finish();
+                } catch (IOException e) {
+                    Toast.makeText(LoginActivity.this, "Erro no login", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                Toast.makeText(LoginActivity.this, "Erro no login", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+
 }

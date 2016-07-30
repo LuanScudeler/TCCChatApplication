@@ -94,37 +94,6 @@ public class XmppManager {
         return conn;
     }
 
-    private class OpenConnection extends AsyncTask<Void, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            if (conn.isConnected())
-                return false;
-
-            try {
-                conn.connect();
-            } catch (SmackException e) {
-                e.printStackTrace();
-                Log.d(TAG, "CONN FAILED");
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            Log.d(TAG, "CONNECTING...");
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-        }
-    }
-
     public static void closeConnection() {
         conn.disconnect();
     }
