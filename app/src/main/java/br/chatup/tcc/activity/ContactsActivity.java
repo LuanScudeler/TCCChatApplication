@@ -50,7 +50,7 @@ public class ContactsActivity extends AppCompatActivity {
         //Add a roster to the current user for testing purposes
         String userJID = "tester@192.168.0.100";
         String nickName = "tester";
-        addUserForTest(roster, userJID, nickName);
+        //addUserForTest(roster, userJID, nickName);
 
         //Get all rosters
         Collection<RosterEntry> entries = roster.getEntries();

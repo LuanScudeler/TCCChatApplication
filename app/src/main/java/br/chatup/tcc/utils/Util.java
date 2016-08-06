@@ -25,8 +25,15 @@ public class Util {
             else
                 cap += str.charAt(cont);
         }
-
         return cap;
+    }
+
+    public static String parseContactName (String contactJID) {
+        String[] split = contactJID.split("@");
+        String pJID = split[0];
+        pJID = pJID.toUpperCase();
+
+        return pJID;
     }
 
 }

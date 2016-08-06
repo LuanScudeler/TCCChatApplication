@@ -1,34 +1,42 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/bubble_parent"
-    android:orientation="vertical"
-    android:gravity="right">
-
+    android:layout_height="wrap_content">
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/bubble_child"
-        android:background="@drawable/sent">
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
 
-        <TextView
+
+
+        <LinearLayout
+            android:id="@+id/contentWithBackground"
+            android:background="@drawable/sent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="teste teste teste"
-            android:gravity="left"
-            android:maxEms="10"
-            android:textColor="#000"
-            android:id="@+id/txtMessage_ChatBubble"/>
+            android:layout_gravity="right"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="right|bottom"
-            android:textColor="@color/abc_background_cache_hint_selector_material_dark"
-            android:layout_marginLeft="2dp"
-            android:text="09:00"/>
+            <TextView
+                android:id="@+id/txtMessage"
+                android:text="Message will be shown here"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:maxWidth="240dp" />
 
+            <TextView
+                android:id="@+id/txtInfo"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_height="20sp"
+                android:text="Date and Time goes here"
+                android:layout_gravity="right"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
