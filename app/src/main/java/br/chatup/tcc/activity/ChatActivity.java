@@ -89,7 +89,6 @@ public class ChatActivity extends AppCompatActivity {
 
 		//TODO receiver (exemplo "luan@luanpc") must come from list of contacts (when contact is selected to start a conversation or to reply a received message)
 		if(!messageBody.equalsIgnoreCase("")) {
-			//final ChatMessage chatMessage = new ChatMessage(messageBody, contactFULL_JID);
 			final Message message = new Message();
 			ChatManager chatManager = ChatManager.getInstanceFor(XmppManager.getConn());
 			//Gets for whom the message will go for (retrieves a user JID)
