@@ -1,7 +1,5 @@
 package br.chatup.tcc.utils;
 
-import android.util.Log;
-
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -10,14 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 /**
@@ -71,12 +61,6 @@ public class RestFacade {
     }
 
     public static ResponseEntity<String> get(String url, Map<String, String> params) {
-
-        Log.i(TAG, String.format(
-                "get: Requesting data from %s address. Query params: %s",
-                url,
-                params.toString()
-        ));
         return restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -85,40 +69,11 @@ public class RestFacade {
                 params);
     }
 
-    public static String get(String url) {
-
-        URL urlSrv = null;
-        HttpURLConnection httpConn = null;
-        DataInputStream in = null;
-
-        try {
-            urlSrv = new URL(url);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            //TODO throw e
-        }
-
-        try {
-            httpConn = (HttpURLConnection) urlSrv.openConnection();
-            httpConn.setRequestProperty("Authorization", basicAuth);
-            httpConn.setRequestProperty("Accept", APPLICATION_JSON);
-            httpConn.setRequestMethod(GET);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            //TODO throw e
-        }
-
-        try {
-            in = new DataInputStream(httpConn.getInputStream());
-            return in.readUTF();
-        } catch (Exception e) {
-            //TODO
-        } finally {
-            httpConn.disconnect();
-        }
-
-        return null;
-
+    public static ResponseEntity<String> get(String url) {
+        return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                buildHttpEntity(),
+                String.class);
     }
 }

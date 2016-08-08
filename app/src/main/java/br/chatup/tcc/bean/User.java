@@ -1,6 +1,10 @@
 package br.chatup.tcc.bean;
 
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+
 import java.io.Serializable;
+
+import br.chatup.tcc.xmpp.XmppManager;
 
 /**
  * Created by jnde on 08/03/2016.

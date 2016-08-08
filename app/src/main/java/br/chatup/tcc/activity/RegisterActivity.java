@@ -10,29 +10,22 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.springframework.http.HttpStatus;
 
-import java.io.IOException;
-
 import br.chatup.tcc.bean.User;
-import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
-import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
 
 public class RegisterActivity extends AppCompatActivity {
 
 	private ProgressDialog pDialog;
-	private XMPPTCPConnection connection = null;
 	private EditText edtName;
 	private EditText edtUsername;
 	private EditText edtEmail;
 	private EditText edtPassword;
 	private EditText edtRepeatPassword;
-	private User user;
 	private static final String TAG = Util.getTagForClass(RegisterActivity.class);
 
 	@Override
@@ -50,7 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 	public void btnSubmitClick(View v) {
 
-		String name = null, username = null, email = null, password = null, repeatPassword = null, userJson = null;
+		String name = null, username = null, email = null, password = null, repeatPassword = null;
 
 		if(!validForm()) {
 			Toast.makeText(this, getResources().getString(R.string.all_fields_are_required), Toast.LENGTH_SHORT).show();
@@ -63,13 +56,11 @@ public class RegisterActivity extends AppCompatActivity {
 			email = edtEmail.getText().toString();
 			password = edtPassword.getText().toString();
 
-			user = new User(username, password, name, email);
-
-			userJson = JsonParser.toJson(user);
+			User user = new User(username, password, name, email);
 
 			RegisterTask rAsync = new RegisterTask();
 
-			rAsync.execute(userJson);
+			rAsync.execute(user);
 
 		}
 	}
@@ -105,7 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 	}
 
-	public class RegisterTask extends AsyncTask<String, Void, HttpStatus> {
+	public class RegisterTask extends AsyncTask<User, Void, User> {
 		@Override
 		protected void onPreExecute() {
 			pDialog = new ProgressDialog(RegisterActivity.this);
@@ -115,35 +106,46 @@ public class RegisterActivity extends AppCompatActivity {
 		}
 
 		@Override
-		protected HttpStatus doInBackground(String... params) {
+		protected User doInBackground(User... params) {
 			HttpStatus status = null;
+			User newUser = params[0];
 			try {
-				status = RestFacade.post(Constants.FULL_SERVER_ADDR, params[0]);
+				String json =
+						"{" +
+							"\"username\": \"%s\", " +
+								"\"password\": \"%s\", " +
+								"\"name\": \"%s\", " +
+								"\"email\": \"%s\" " +
+						"}";
+				status = RestFacade.post(Constants.RESTAPI_USER_URL, String.format(json,
+						newUser.getUsername(),
+						newUser.getPassword(),
+						newUser.getName(),
+						newUser.getEmail()));
+				if(status == null || !status.equals(HttpStatus.CREATED)) {
+					newUser = null;
+				}
 			} catch(Exception ex) {
 				ex.printStackTrace();
+				newUser = null;
 			}
-			return status;
+			return newUser;
 		}
 
 		@Override
-		protected void onPostExecute(HttpStatus s) {
+		protected void onPostExecute(User user) {
 			pDialog.cancel();
-			if(s != null && s.equals(HttpStatus.CREATED)) {
-				Toast.makeText(RegisterActivity.this, getResources().getString(R.string.user_registered_successfully), Toast.LENGTH_SHORT).show();
-
+			if(user != null) {
 				try {
-					CacheStorage.storeUserInfo(user, RegisterActivity.this);
-					//connection = xmppManager.initConnection();
-				} catch(IOException e) {
+					Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
+					Toast.makeText(RegisterActivity.this, getResources().getString(R.string.user_registered_successfully), Toast.LENGTH_SHORT).show();
+					startActivity(i);
+					finish();
+				} catch(Exception e) {
 					Log.e(TAG, "onPostExecute: ", e);
-					//e.printStackTrace();
-				} /*catch (SmackException e) {
-	                e.printStackTrace();
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                }*/
+				}
 
-				Intent i = new Intent(RegisterActivity.this, GlobalActivity.class);
+				Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
 				startActivity(i);
 				finish();
 			} else {

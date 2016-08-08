@@ -22,13 +22,14 @@ import java.io.IOException;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.Util;
 
 /**
  * Created by Luan on 3/12/2016.
  */
 public class XmppManager {
 
-    private static final String TAG = Constants.LOG_TAG + XmppManager.class.getSimpleName();
+    private static final String TAG = Util.getTagForClass(XmppManager.class);
 
     static private XMPPTCPConnection conn = null;
     private static final Integer REPLAY_TIMEOUT = 20000;

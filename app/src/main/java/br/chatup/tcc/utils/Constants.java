@@ -5,20 +5,20 @@ package br.chatup.tcc.utils;
  */
 public class Constants {
 
-    public static final String XMPP_SERVER_IP = "52.67.111.6";
+    public static final String XMPP_SERVER_IP = "192.168.0.103";
+    public static final int XMPP_SERVER_RESTAPI_PORT = 9090;
+    public static final String XMPP_SERVER_RESTAPI_PATH = "/plugins/restapi/v1";
+    public static final String RESTAPI_USER_URL = "http://"
+                    .concat(XMPP_SERVER_IP)
+                    .concat(":")
+                    .concat(""+XMPP_SERVER_RESTAPI_PORT)
+                    .concat(XMPP_SERVER_RESTAPI_PATH)
+                    .concat("/users");
     public static final int XMPP_SERVER_PORT = 5222;
-    public static final int XMPP_SERVER_PORT_REGISTER = 9090;
-    public static final String XMPP_SERVER_REGISTER_PATH = "/plugins/restapi/v1/users";
     public static final String LOG_TAG = "CHATUP-";
     public static final String FULL_JID_APPEND = "/Smack";
-    public static final String FULL_SERVER_ADDR = "http://" + Constants.XMPP_SERVER_IP
-            .concat(":")
-            .concat(String.valueOf(Constants.XMPP_SERVER_PORT_REGISTER))
-            .concat(Constants.XMPP_SERVER_REGISTER_PATH);
 
-    public static final String SERVER_SECRET_KEY = "";
-
-    public static final String FIND_USER_PATH = "http://" + XMPP_SERVER_IP + ":" + XMPP_SERVER_PORT_REGISTER + XMPP_SERVER_REGISTER_PATH + "/%s";
+    public static final String SERVER_SECRET_KEY = "#eYHo009sxTR4sa_09";
 
     // Messages
 

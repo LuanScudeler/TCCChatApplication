@@ -1,38 +1,41 @@
 package br.chatup.tcc.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 
 import br.chatup.tcc.bean.User;
-import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
-import br.chatup.tcc.utils.Constants;
-import br.chatup.tcc.utils.JsonParser;
+import br.chatup.tcc.utils.Util;
 import br.chatup.tcc.xmpp.XmppManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private User user;
-    private String userJson;
     private TextView txtHelloUser;
     private ImageView imgViewUserPhoto;
-    private static final String TAG = Constants.LOG_TAG + MainActivity.class.getSimpleName();
+    private static final String TAG = Util.getTagForClass(MainActivity.class);
+    private ProgressDialog pDialog;
+    private XMPPTCPConnection conn;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +64,16 @@ public class MainActivity extends AppCompatActivity
 
         txtHelloUser = (TextView) findViewById(R.id.txtHelloUser);
 
-        userJson = getIntent().getExtras().getString("user");
-
-        if(userJson != null){
-            user = JsonParser.fromJson(User.class, userJson);
+        if(getIntent().getExtras() == null) {
+            Intent i = new Intent(this, LoginActivity.class);
+            startActivity(i);
+            finish();
         }
-
-        txtHelloUser.setText(String.format("Welcome %s", user.getUsername()));
-
-        imgViewUserPhoto = (ImageView) findViewById(R.id.imgViewUserPhoto);
-
-        imgViewUserPhoto.setImageDrawable(ContextCompat.getDrawable(this, R.mipmap.user));
-
-
+        else {
+            user = (User) getIntent().getExtras().get("user");
+            InitConnectionTask ict = new InitConnectionTask();
+            ict.execute();
+        }
     }
 
     @Override
@@ -102,19 +102,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.actionExitMain) {
-            //TODO: Logout already implemented in Side Navagation Bar
-            //CacheStorage.removeAllCache(this, user.getUsername());
-            CacheStorage.deactivateUsers(this);
-            Intent i = new Intent(this, GlobalActivity.class);
-            startActivity(i);
-            finish();
-            return true;
+            //TODO: implemantar
         }
         else if(id == R.id.actionClearAllMain) {
-            CacheStorage.removeAllCache(this, user.getUsername());
-            Intent i = new Intent(this, GlobalActivity.class);
-            startActivity(i);
-            finish();
+            //TODO implementar
             return true;
         }
 
@@ -133,10 +124,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
         } else if (id == R.id.nav_logout) {
             Log.d(TAG, "LOGOUT TRIGGED");
-            //CacheStorage.deactivateUsers(this); -- Cache is now cleared on connection closure listener
-            XmppManager.closeConnection();
-
-            Intent i = new Intent(this, GlobalActivity.class);
+            Intent i = new Intent(this, LoginActivity.class);
             startActivity(i);
             finish();
         }
@@ -145,4 +133,43 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public class InitConnectionTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Loading...");
+            pDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            XmppManager xmppManager = new XmppManager();
+            try {
+                conn = xmppManager.initConnection();
+                conn.login(user.getUsername(), user.getPassword());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean status) {
+            pDialog.cancel();
+            if(status) {
+                txtHelloUser.setText(String.format("Hello %s", user.getUsername()));
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Erro de autenticação", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(i);
+                finish();
+            }
+
+        }
+    }
+
 }

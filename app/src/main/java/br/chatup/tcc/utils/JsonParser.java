@@ -2,10 +2,6 @@ package br.chatup.tcc.utils;
 
 import com.google.gson.Gson;
 
-import java.util.Objects;
-
-import br.chatup.tcc.bean.User;
-
 /**
  * Created by jnde on 09/03/2016.
  */

@@ -154,7 +154,7 @@ public class CacheStorage {
         return user;
     }
 
-    public static String getActiveUser(Activity activity) throws IOException {
+    public static User getActiveUser(Activity activity) throws IOException {
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
         DataInputStream dis;
 
@@ -168,7 +168,7 @@ public class CacheStorage {
 
             try {
                 dis = new DataInputStream(new FileInputStream(activeUserFile));
-                return dis.readUTF();
+                return JsonParser.fromJson(User.class, dis.readUTF());
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "getActivrUser: ", e);
                 throw e;

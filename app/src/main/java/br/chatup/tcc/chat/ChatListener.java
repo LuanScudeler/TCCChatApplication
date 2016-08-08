@@ -7,6 +7,7 @@ import org.jivesoftware.smack.chat.ChatManagerListener;
 
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.Util;
 
 /**
  * Created by Luan on 5/8/2016.
@@ -17,7 +18,7 @@ public class ChatListener implements ChatManagerListener {
     * It adds a message listener to the chat to receive all future messages
     *
     * */
-    private static final String TAG = Constants.LOG_TAG + ChatListener.class.getSimpleName();
+    private static final String TAG = Util.getTagForClass(ChatListener.class);
 
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
