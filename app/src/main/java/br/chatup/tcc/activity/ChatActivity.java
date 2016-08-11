@@ -1,7 +1,7 @@
 package br.chatup.tcc.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -16,7 +16,6 @@ import org.jxmpp.util.XmppDateTime;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
@@ -80,17 +79,16 @@ public class ChatActivity extends AppCompatActivity {
         messageBody = edtMessageBody.getText().toString();
         chatMessage = new ChatMessage(messageBody, contactFULL_JID, true, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
 
-        sendMessage();
+        //sendMessage();
         displayMessage(chatMessage);
+		edtMessageBody.setText("");
 	}
 
-	public void sendMessage() {
-
-
+	public void sendMessage(XmppManager xmppManager) {
 		//TODO receiver (exemplo "luan@luanpc") must come from list of contacts (when contact is selected to start a conversation or to reply a received message)
 		if(!messageBody.equalsIgnoreCase("")) {
 			final Message message = new Message();
-			ChatManager chatManager = ChatManager.getInstanceFor(XmppManager.getConn());
+			ChatManager chatManager = ChatManager.getInstanceFor(xmppManager.getConn());
 			//Gets for whom the message will go for (retrieves a user JID)
 			String messageReceiver = chatMessage.getReceiver();
 

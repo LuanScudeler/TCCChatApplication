@@ -16,198 +16,76 @@ import java.util.HashMap;
 
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.utils.JsonParser;
+import br.chatup.tcc.utils.Util;
 
 /**
  * Created by jnde on 08/03/2016.
  */
 public class CacheStorage {
-
-    private static final String CACHE_FILE_USER_INFO_SUFIX = "_cache.json";
-    private static final String CACHE_FILE_USER_PHOTO_SUFIX = "_photo.json";
     private static final String CURRENT_ACTIVE_USER_FILE = "active.json";
     private static final String CACHE_DIR = "cache";
 
     private static HashMap<String, String> openChats = new HashMap<String, String>();;
 
-    private static final String TAG = CacheStorage.class.getSimpleName();
+    private static final String TAG = Util.getTagForClass(CacheStorage.class);
 
-    public static void removeAllCache(Activity activity, String userName) {
-
-        removeUserCacheInfo(activity, userName);
-
+    public static boolean activateUser(Activity activity, User user) {
+        boolean ret = false;
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-
         String activeUserFilePath = cacheDirPath.getAbsolutePath()
                 .concat("/")
                 .concat(CURRENT_ACTIVE_USER_FILE);
-
         File activeUserFile  = new File(activeUserFilePath);
-
-        if(activeUserFile.exists()){
-            activeUserFile.delete();
-        }
-
-    }
-
-    public static void deactivateUsers(Activity activity) {
-        File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-
-        String activeUserFilePath = cacheDirPath.getAbsolutePath()
-                .concat("/")
-                .concat(CURRENT_ACTIVE_USER_FILE);
-
-        File activeUserFile  = new File(activeUserFilePath);
-
-        if(activeUserFile.exists()){
-            activeUserFile.delete();
-        }
-    }
-
-    public static void removeUserCacheInfo(Activity activity, String userName) {
-
-        File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-
-        String cacheFilePath = cacheDirPath.getAbsolutePath()
-                .concat("/")
-                .concat(userName.trim().toUpperCase())
-                .concat(CACHE_FILE_USER_INFO_SUFIX);
-
-        File cacheFile = new File(cacheFilePath);
-
-        if(cacheFile.exists()) {
-            cacheFile.delete();
-        }
-    }
-
-
-    public static void storeUserInfo(User user, Activity activity) throws IOException, FileNotFoundException {
-
-        File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-
-        String cacheFilePath = cacheDirPath.getAbsolutePath()
-                .concat("/")
-                .concat(user.getUsername().trim().toUpperCase())
-                .concat(CACHE_FILE_USER_INFO_SUFIX);
-
-        File cacheFile = new File(cacheFilePath);
-
-        String json = JsonParser.toJson(user);
-
         DataOutputStream dos = null;
-
         try {
-            dos = new DataOutputStream(new FileOutputStream(cacheFile));
-            dos.writeUTF(json);
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "Storing User info on cache file: ", e);
-            throw e;
-        } catch (IOException e) {
-            Log.e(TAG, "Storing User info on cache file: ", e);
-            throw e;
-        } finally {
-            if(dos != null)
-                dos.close();
+            dos = new DataOutputStream(new FileOutputStream(activeUserFile));
+            dos.writeUTF(JsonParser.toJson(user));
+            ret = true;
+            if(dos != null) dos.close();
+        } catch(Exception e) {
+            Log.e(TAG, "activateUser: ", e);
+            ret = false;
         }
-
-        activateUser(activity, user);
-
-    }
-
-    public static User readUserInfo(Activity activity, String username) throws IOException, FileNotFoundException {
-
-        File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-
-        String cacheFilePath = cacheDirPath.getAbsolutePath()
-                .concat("/")
-                .concat(username.trim().toUpperCase())
-                .concat(CACHE_FILE_USER_INFO_SUFIX);
-
-        File cacheFile = new File(cacheFilePath);
-
-        String userJson;
-
-        User user = null;
-
-        DataInputStream dis = null;
-
-        if(cacheFile.exists()) {
-            try {
-
-                dis = new DataInputStream(new FileInputStream(cacheFile));
-
-                userJson = dis.readUTF();
-
-                user = JsonParser.fromJson(User.class, userJson);
-
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "Reading User info from cache file: ", e);
-            } catch (IOException e) {
-                Log.e(TAG, "Reading User info from cache file: ", e);
-                throw e;
-            } finally {
-                if(dis != null) {
-                    dis.close();
-                }
-            }
-        }
-
-        return user;
+        return ret;
     }
 
     public static User getActiveUser(Activity activity) throws IOException {
+        User user = null;
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-        DataInputStream dis;
-
         String activeUserFilePath = cacheDirPath.getAbsolutePath()
                 .concat("/")
                 .concat(CURRENT_ACTIVE_USER_FILE);
-
         File activeUserFile  = new File(activeUserFilePath);
-
-        if(activeUserFile.exists()) {
-
-            try {
-                dis = new DataInputStream(new FileInputStream(activeUserFile));
-                return JsonParser.fromJson(User.class, dis.readUTF());
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "getActivrUser: ", e);
-                throw e;
-            } catch (IOException e) {
-                Log.e(TAG, "getActivrUser: ", e);
-                throw e;
-            }
-
+        DataInputStream dis = null;
+        try {
+            dis = new DataInputStream(new FileInputStream(activeUserFile));
+            String s = dis.readUTF();
+            user = JsonParser.fromJson(User.class, s);
+        } catch(FileNotFoundException e) {
+            Log.e(TAG, "getActiveUser: ", e);
+            user = null;
+        } finally {
+            if(dis != null) dis.close();
         }
-
-        return null;
+        return user;
     }
 
-    public static void activateUser(Activity activity, User user) throws IOException {
-
+    public static boolean deactivateUser(Activity activity) {
+        boolean ret = false;
         File cacheDirPath = activity.getDir(CACHE_DIR, Context.MODE_PRIVATE);
-
         String activeUserFilePath = cacheDirPath.getAbsolutePath()
                 .concat("/")
                 .concat(CURRENT_ACTIVE_USER_FILE);
-
         File activeUserFile  = new File(activeUserFilePath);
-
-        DataOutputStream dos = null;
-
         try {
-            dos = new DataOutputStream(new FileOutputStream(activeUserFile));
-            dos.writeUTF(user.getUsername());
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "Storing User info on cache file: ", e);
-            throw e;
-        } catch (IOException e) {
-            Log.e(TAG, "Storing User info on cache file: ", e);
-            throw e;
-        } finally {
-            if(dos != null)
-                dos.close();
+            if(activeUserFile.exists()) {
+                ret = activeUserFile.delete();
+            }
+        } catch(Exception e) {
+            Log.e(TAG, "activateUser: ", e);
+            ret = false;
         }
-
+        return ret;
     }
 
     public static void storeUserPhoto(Bitmap photo) {

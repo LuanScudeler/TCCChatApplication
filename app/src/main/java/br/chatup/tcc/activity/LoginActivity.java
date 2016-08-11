@@ -1,5 +1,6 @@
 package br.chatup.tcc.activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -14,7 +15,10 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+
 import br.chatup.tcc.bean.User;
+import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.RestFacade;
@@ -27,12 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
 
     private static final String TAG = Constants.LOG_TAG + LoginActivity.class.getSimpleName();
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //TODO get cache info if there is a user logged in
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                     return null;
                 }
                 else {
-                    XmppManager xmppManager = new XmppManager();
-                    XMPPTCPConnection xmpptcpConnection = xmppManager.initConnection();
-                    xmpptcpConnection.login(user.getUsername(), user.getPassword());
                     return user;
                 }
 
@@ -103,9 +98,8 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             }
             else {
-                //TODO store user cache
+                CacheStorage.activateUser(LoginActivity.this, user);
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                i.putExtra("user", user);
                 startActivity(i);
                 finish();
             }

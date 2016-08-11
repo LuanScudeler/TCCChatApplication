@@ -81,4 +81,14 @@ public class User implements Serializable {
         result = 31 * result + email.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

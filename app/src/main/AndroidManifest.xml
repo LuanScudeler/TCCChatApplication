@@ -13,13 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service android:name="br.chatup.tcc.service.XmppConnectionService"
-            android:exported="false" />
+        <service android:name="br.chatup.tcc.service.XmppService" android:enabled="true"
+            android:exported="false"></service>
 
-        <activity android:name="br.chatup.tcc.activity.MainActivity"
+        <activity android:name="br.chatup.tcc.activity.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name="br.chatup.tcc.activity.LoginActivity"
+        <activity android:name="br.chatup.tcc.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

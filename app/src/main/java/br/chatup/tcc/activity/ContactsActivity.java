@@ -44,19 +44,19 @@ public class ContactsActivity extends AppCompatActivity {
         //Set subscriptionMode on "accept_all" users will automatically accept invite requests
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
-        Roster roster = Roster.getInstanceFor(XmppManager.getConn());
-        startRosterPresenceListener(roster);
+       // Roster roster = Roster.getInstanceFor(XmppManager.getConn());
+        //startRosterPresenceListener(roster);
 
         //Add a roster to the current user for testing purposes
-        String userJID = "tester@192.168.0.100";
-        String nickName = "tester";
+        String userJID = "a@192.168.0.103";
+        String nickName = "a";
         //addUserForTest(roster, userJID, nickName);
 
         //Get all rosters
-        Collection<RosterEntry> entries = roster.getEntries();
-        entriesList.addAll(entries);
+        //Collection<RosterEntry> entries = roster.getEntries();
+        //entriesList.addAll(entries);
 
-        for (RosterEntry entry : entries) {
+        for (RosterEntry entry : entriesList) {
             Log.d(TAG, "Entry: JID: " +  entry.getUser() + " Nickname: " + entry.getName());
         }
 
