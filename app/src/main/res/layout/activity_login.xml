@@ -1,77 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="br.chatup.tcc.activity.LoginActivity"
-    android:background="@drawable/background">
+    android:background="@drawable/background"
+    android:padding="10dp"
+    tools:context="br.chatup.tcc.activity.LoginActivity">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/scrollView">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:ems="10"
                 android:id="@+id/edtUsername_Login"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="56dp"
-                android:hint="@string/username" />
-
-            <EditText
+                android:inputType="text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
+                android:textColor="@color/white"
+                android:textColorHighlight="@color/white"
+                android:textColorHint="@color/white"
+                android:textColorLink="@color/white"
+                android:hint="@string/username"
+                android:layout_marginTop="20dp"/>
+
+            <EditText
                 android:id="@+id/edtPassword_Login"
-                android:layout_below="@+id/edtUsername_Login"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="41dp"
-                android:hint="@string/password" />
+                android:inputType="textPassword"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textColorHighlight="@color/white"
+                android:textColorHint="@color/white"
+                android:textColorLink="@color/white"
+                android:hint="@string/password"
+                android:layout_marginTop="20dp"/>
 
             <Button
-                android:layout_width="fill_parent"
-                android:layout_height="70dp"
+                android:id="@+id/btnLogin_LoginActivity"
+                android:textSize="@dimen/meddium_text"
                 android:text="@string/login"
-                android:id="@+id/btnLogin"
-                android:background = "@drawable/roundedbutton"
-                android:layout_marginTop="61dp"
-                android:layout_below="@+id/edtPassword_Login"
-                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/default_button_height"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="25dp"
-                android:onClick="btnLoginClick"/>
-
+                android:background="@color/colorPrimary"
+                android:layout_marginTop="20dp"/>
 
             <Button
-                android:layout_width="fill_parent"
-                android:layout_height="70dp"
-                android:text="@string/register"
                 android:id="@+id/btnRegister"
-                android:layout_marginTop="15dp"
-                android:background = "@drawable/roundedbutton_darker"
+                android:textSize="@dimen/meddium_text"
+                android:text="@string/signup"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/default_button_height"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="25dp"
+                android:background = "@color/colorPrimaryDark"
                 android:onClick="btnRegisterClick"
-                android:layout_below="@+id/btnLogin"
-                android:layout_alignParentStart="true" />
+                android:layout_marginTop="20dp"/>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </ScrollView>
 
-</RelativeLayout>
+</LinearLayout>

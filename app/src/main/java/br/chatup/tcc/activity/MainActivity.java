@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView imgViewUserPhoto;
     private ProgressDialog pDialog;
     private static boolean serviceConnected;
-    private static XmppService xmppService = null;
+    private static XmppService xmppService;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {

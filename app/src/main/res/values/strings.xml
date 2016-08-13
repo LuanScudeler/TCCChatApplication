@@ -1,14 +1,8 @@
 <resources>
-
-
     <!-- oauth -->
     <string name="servr_client_id">468641700472-tnritscfo840jcce0qd43qorbl192se5.apps.googleusercontent.com</string>
 
     <string name="app_name">ChatUp</string>
-
-    <string name="clear_all">Clear all user info</string>
-
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -16,30 +10,30 @@
 
     <!-- Globals -->
     <string name="conn_to_srv">Connecting...</string>
-    <string name="submit">Submit</string>
-    <string name="wait">Wait...</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="confirm">Confirm</string>
 
     <!-- LoginActivity -->
-    <string name="login">Login</string>
+    <string name="signin">Sign In</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="please_type_email_pass">Please type your email and password</string>
-    <string name="conn_fin">Connection finished</string>
+    <string name="connection_finished">Connection finished</string>
+    <string name="welcome">Welcome</string>
     <string name="signup">Sign Up</string>
-    <string name="welcome">Welcome!</string>
-    <string name="register">Register</string>
+    <string name="login_failed">Login failed</string>
 
     <!-- MainActivity -->
     <string name="exit">Exit</string>
     <string name="backup">Backup</string>
 
     <!-- RegisterActivity -->
-    <string name="sorry">Sorry! An error occured, check your internet connection and try again</string>
+    <string name="sorry_an_error_occured">Sorry! An error occured, check your internet connection and try again later</string>
     <string name="repeat_password">Repeat password</string>
     <string name="name">Name</string>
     <string name="username">Username</string>
     <string name="new_user">New User</string>
     <string name="all_fields_are_required">All fields are required</string>
     <string name="password_dont_match">Password do not match</string>
-    <string name="user_registered_successfully">User registered successfully!</string>
+    <string name="user_registered_successfully">User registered successfully</string>
 </resources>

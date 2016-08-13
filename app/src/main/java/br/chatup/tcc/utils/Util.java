@@ -1,5 +1,7 @@
 package br.chatup.tcc.utils;
 
+import android.app.Activity;
+
 import java.nio.charset.Charset;
 
 /**
@@ -8,7 +10,11 @@ import java.nio.charset.Charset;
 public class Util {
 
     public static String getTagForClass(Class clazz) {
-        return Constants.LOG_TAG + clazz.getClass().getSimpleName();
+        return Constants.LOG_TAG + clazz.getSimpleName();
+    }
+
+    public static String getStringResource(Activity activity, int id) {
+        return activity.getResources().getString(id);
     }
 
     public static String parseByteArrayToStr(byte[] bytes) {

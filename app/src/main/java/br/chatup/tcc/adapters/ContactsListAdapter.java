@@ -13,13 +13,14 @@ import java.util.List;
 
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.Util;
 
 /**
  * Created by Luan on 5/29/2016.
  */
 public class ContactsListAdapter extends ArrayAdapter<RosterEntry>{
 
-    private static final String TAG = Constants.LOG_TAG + ContactsListAdapter.class.getSimpleName();
+    private static final String TAG = Util.getTagForClass(ContactsListAdapter.class);
 
     public ContactsListAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);

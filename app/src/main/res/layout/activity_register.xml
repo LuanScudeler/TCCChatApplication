@@ -75,7 +75,7 @@
                 android:hint="@string/repeat_password" />
 
             <Button
-                android:text="@string/submit"
+                android:text="@string/confirm"
                 android:id="@+id/btnSubmit_Register"
                 android:layout_below="@+id/edtRepeatPassword_Register"
                 android:layout_centerHorizontal="true"

@@ -100,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
 		@Override
 		protected void onPreExecute() {
 			pDialog = new ProgressDialog(RegisterActivity.this);
-			String message = getResources().getString(R.string.wait);
+			String message = getResources().getString(R.string.please_wait);
 			pDialog.setMessage(message);
 			pDialog.show();
 		}
@@ -149,7 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
 				startActivity(i);
 				finish();
 			} else {
-				Toast.makeText(RegisterActivity.this, getResources().getString(R.string.sorry), Toast.LENGTH_SHORT).show();
+				Toast.makeText(RegisterActivity.this, getResources().getString(R.string.sorry_an_error_occured), Toast.LENGTH_SHORT).show();
 			}
 		}
 
