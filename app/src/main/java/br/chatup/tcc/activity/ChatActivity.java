@@ -1,9 +1,15 @@
 package br.chatup.tcc.activity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -11,6 +17,7 @@ import android.widget.TextView;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.util.XmppDateTime;
 
@@ -20,10 +27,13 @@ import java.util.Date;
 import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.cache.CacheStorage;
+
 import br.chatup.tcc.myapplication.R;
+import br.chatup.tcc.service.LocalBinder;
+import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.Util;
-import br.chatup.tcc.xmpp.XmppManager;
+
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -35,6 +45,28 @@ public class ChatActivity extends AppCompatActivity {
 	private Chat newChat;
     private ListView messagesContainer;
     private ChatContainerAdapter chatContainerAdapter;
+    private static boolean serviceConnected;
+    private static XmppService xmppService;
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            xmppService = ((LocalBinder<XmppService>) iBinder).getService();
+            serviceConnected = true;
+            Log.d(TAG, "onServiceConnected: " + xmppService);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.d(TAG, "onServiceDisconnected: ");
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent i = new Intent(getBaseContext(), XmppService.class);
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+    }
 
 	private String contactJID;
 	private String contactFULL_JID;
@@ -66,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
 
     public void displayMessage(ChatMessage message) {
         chatContainerAdapter.add(message);
-        chatContainerAdapter.notifyDataSetChanged();
+        ((ChatContainerAdapter) messagesContainer.getAdapter()).notifyDataSetChanged();
         scroll();
     }
 
@@ -79,26 +111,41 @@ public class ChatActivity extends AppCompatActivity {
         messageBody = edtMessageBody.getText().toString();
         chatMessage = new ChatMessage(messageBody, contactFULL_JID, true, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
 
-        //sendMessage();
+        sendMessage();
         displayMessage(chatMessage);
 		edtMessageBody.setText("");
 	}
 
-	public void sendMessage(XmppManager xmppManager) {
-		//TODO receiver (exemplo "luan@luanpc") must come from list of contacts (when contact is selected to start a conversation or to reply a received message)
+	public void sendMessage() {
 		if(!messageBody.equalsIgnoreCase("")) {
 			final Message message = new Message();
-			ChatManager chatManager = ChatManager.getInstanceFor(xmppManager.getConn());
+			ChatManager chatManager = ChatManager.getInstanceFor(xmppService.getXmppManager().getConn());
 			//Gets for whom the message will go for (retrieves a user JID)
 			String messageReceiver = chatMessage.getReceiver();
 
-			//For tests:: change "luanpc" for your xmpp.domain value. Can be found in openfire at Server Manager > System Properties
 			if(!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
-				newChat = chatManager.createChat(messageReceiver, new br.chatup.tcc.chat.MessageListener(ChatActivity.this));
-				CacheStorage.addChatContact(messageReceiver, newChat.getThreadID());
+				newChat = chatManager.createChat(messageReceiver, new ChatMessageListener() {
+                    @Override
+                    public void processMessage(Chat chat, Message message) {
+                        Log.d(TAG, "MESSAGE RECEIVED: Body: " + message.getBody() + " - User: " + chat.getParticipant() + " - ThreadID: " + chat.getThreadID());
+                        //Gets from who the message came from
+                        if (message.getType() == Message.Type.chat && message.getBody() != null) {
+                            chatMessage = new ChatMessage(message.getBody(), chat.getParticipant(), false, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
 
-				Log.d(TAG, "CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + messageReceiver + " ThreadID:" + newChat.getThreadID());
-			} else {
+                            //Test for update chatContainerListView
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    displayMessage(chatMessage);
+                                }
+                            });
+                        }
+                    }
+                });
+
+                CacheStorage.addChatContact(messageReceiver,newChat.getThreadID());
+                Log.d(TAG,"CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: "+messageReceiver+" ThreadID:"+newChat.getThreadID());
+            }else {
 				//Get chat threadID from cachedChats for the current contact that the user is chatting with
 				newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactFULL_JID));
 				//Set on message the chat threadID that already exist in the cachedChats

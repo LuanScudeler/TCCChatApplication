@@ -62,7 +62,7 @@ public class CacheStorage {
             String s = dis.readUTF();
             user = JsonParser.fromJson(User.class, s);
         } catch(FileNotFoundException e) {
-            Log.e(TAG, "getActiveUser: ", e);
+            Log.e(TAG, "getActiveUser: No active user was found at " + e.getMessage());
             user = null;
         } finally {
             if(dis != null) dis.close();

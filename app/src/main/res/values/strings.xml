@@ -21,6 +21,7 @@
     <string name="connection_finished">Connection finished</string>
     <string name="welcome">Welcome</string>
     <string name="signup">Sign Up</string>
+    <string name="login">Login</string>
     <string name="login_failed">Login failed</string>
 
     <!-- MainActivity -->
