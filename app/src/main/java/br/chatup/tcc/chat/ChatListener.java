@@ -1,10 +1,12 @@
 package br.chatup.tcc.chat;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 
+import br.chatup.tcc.activity.ChatActivity;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.Util;
@@ -19,14 +21,18 @@ public class ChatListener implements ChatManagerListener {
     *
     * */
     private static final String TAG = Util.getTagForClass(ChatListener.class);
+    private Context context;
+
+    public ChatListener (Context context) {
+        this.context = context;
+    }
 
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
         if (!createdLocally) {
-            //TODO cachedChats is already verified in ChatActivity when creating chat. This if() can probably be removed
             if(!CacheStorage.getInstanceCachedChats().containsKey(chat.getParticipant())){
                 CacheStorage.addChatContact(chat.getParticipant(), chat.getThreadID());
-                chat.addMessageListener(new MessageListener());
+                chat.addMessageListener(new MessageListener(context));
                 Log.d(TAG, "CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + chat.getParticipant() + " ThreadID:" + chat.getThreadID());
             }else{
                 Log.d(TAG, "CHAT ALREADY CREATED: " + "Contact: " + chat.getParticipant() + " ThreadID: " + CacheStorage.getInstanceCachedChats().get(chat.getParticipant()));

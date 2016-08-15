@@ -16,6 +16,10 @@
             android:name="br.chatup.tcc.service.XmppService"
             android:enabled="true"
             android:exported="false" />
+        <service
+            android:name="br.chatup.tcc.service.MessageService"
+            android:enabled="true"
+            android:exported="false" />
 
         <activity
             android:name="br.chatup.tcc.activity.LoginActivity"

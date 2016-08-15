@@ -50,12 +50,12 @@ public class XmppManager {
         conn.addConnectionListener(new ConnectionListener() {
             @Override
             public void connected(XMPPConnection connection) {
-                Log.i(TAG, "connected: " + user);
+                Log.i(TAG, "User connected: " + user);
             }
 
             @Override
             public void authenticated(XMPPConnection connection, boolean resumed) {
-                ChatManager.getInstanceFor(connection).addChatListener(new ChatListener());
+                Log.i(TAG, "User authenticated: " + user);
             }
 
             @Override

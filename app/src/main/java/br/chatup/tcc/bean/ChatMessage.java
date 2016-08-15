@@ -1,12 +1,13 @@
 package br.chatup.tcc.bean;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Luan on 5/13/2016..
  */
 
-public class ChatMessage {
+public class ChatMessage implements Serializable{
 
     private String body;
     private String receiver;

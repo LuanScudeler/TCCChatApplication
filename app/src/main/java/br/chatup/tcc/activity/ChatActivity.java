@@ -1,11 +1,15 @@
 package br.chatup.tcc.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +32,7 @@ import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.cache.CacheStorage;
 
+import br.chatup.tcc.chat.MessageListener;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
@@ -45,6 +50,12 @@ public class ChatActivity extends AppCompatActivity {
 	private Chat newChat;
     private ListView messagesContainer;
     private ChatContainerAdapter chatContainerAdapter;
+
+    private String contactJID;
+    private String contactFULL_JID;
+    private String messageBody;
+    private ChatMessage chatMessage;
+
     private static boolean serviceConnected;
     private static XmppService xmppService;
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -61,6 +72,15 @@ public class ChatActivity extends AppCompatActivity {
         }
     };
 
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
+            Log.d(TAG, "[BroadcastReceiver] Message received: " + message.getBody());
+            displayMessage(message);
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -68,18 +88,13 @@ public class ChatActivity extends AppCompatActivity {
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
     }
 
-	private String contactJID;
-	private String contactFULL_JID;
-    private String messageBody;
-    private ChatMessage chatMessage;
-
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
 
 		edtMessageBody = (EditText) findViewById(R.id.edtMessage);
-		tvContact = (TextView) findViewById(R.id.tvContact);
+        tvContact = (TextView) findViewById(R.id.tvContact);
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
 		contactJID = getIntent().getExtras().getString("contactJID").toString();
@@ -88,10 +103,26 @@ public class ChatActivity extends AppCompatActivity {
 
 		tvContact.setText(Util.parseContactName(contactFULL_JID));
         initChatContainer();
-	}
+    }
+
+    @Override
+    protected void onResume() {
+        // Register to receive messages.
+        // Registering an observer (mMessageReceiver) to receive Intents
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("receivedMessage"));
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        // Unregister since the activity is paused.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(
+                mMessageReceiver);
+        super.onPause();
+    }
 
     private void initChatContainer() {
-
         chatContainerAdapter = new ChatContainerAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(chatContainerAdapter);
     }
@@ -124,24 +155,7 @@ public class ChatActivity extends AppCompatActivity {
 			String messageReceiver = chatMessage.getReceiver();
 
 			if(!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
-				newChat = chatManager.createChat(messageReceiver, new ChatMessageListener() {
-                    @Override
-                    public void processMessage(Chat chat, Message message) {
-                        Log.d(TAG, "MESSAGE RECEIVED: Body: " + message.getBody() + " - User: " + chat.getParticipant() + " - ThreadID: " + chat.getThreadID());
-                        //Gets from who the message came from
-                        if (message.getType() == Message.Type.chat && message.getBody() != null) {
-                            chatMessage = new ChatMessage(message.getBody(), chat.getParticipant(), false, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
-
-                            //Test for update chatContainerListView
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    displayMessage(chatMessage);
-                                }
-                            });
-                        }
-                    }
-                });
+				newChat = chatManager.createChat(messageReceiver, new MessageListener(ChatActivity.this));
 
                 CacheStorage.addChatContact(messageReceiver,newChat.getThreadID());
                 Log.d(TAG,"CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: "+messageReceiver+" ThreadID:"+newChat.getThreadID());
@@ -165,7 +179,7 @@ public class ChatActivity extends AppCompatActivity {
 		}
 	}
 
-	//TODO: Handle message receivement, allowing user to answer the first message (GUI stuffs, list activity and user notification for incoming messages)
+	//TODO: Allow user to answer the first message (GUI stuffs, list activity and user notification for incoming messages)
 }
 
 

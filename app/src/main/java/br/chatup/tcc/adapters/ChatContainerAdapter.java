@@ -68,8 +68,7 @@ public class ChatContainerAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        boolean myMsg = chatMessage.isMe() ;//Just a dummy check
-        //to simulate whether it me or other sender
+        boolean myMsg = chatMessage.isMe() ;
         setAlignment(holder, myMsg);
         holder.txtMessage.setText(chatMessage.getBody());
         holder.txtInfo.setText(chatMessage.getDate());
@@ -96,8 +95,7 @@ public class ChatContainerAdapter extends BaseAdapter {
 
             RelativeLayout.LayoutParams lp =
                     (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
-            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-            //lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
             holder.content.setLayoutParams(lp);
             layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
             layoutParams.gravity = Gravity.LEFT;
@@ -116,8 +114,7 @@ public class ChatContainerAdapter extends BaseAdapter {
 
             RelativeLayout.LayoutParams lp =
                     (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
-            //lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-            //lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 1);
             holder.content.setLayoutParams(lp);
             layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
             layoutParams.gravity = Gravity.RIGHT;

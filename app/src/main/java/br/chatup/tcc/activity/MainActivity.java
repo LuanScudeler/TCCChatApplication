@@ -1,9 +1,11 @@
 package br.chatup.tcc.activity;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,14 +24,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.ChatManager;
 
 import java.io.IOException;
 
+import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
+import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
@@ -57,6 +64,17 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
+            Log.d(TAG, "[BroadcastReceiver] Message received: " + message.getBody());
+
+            Toast.makeText(getApplicationContext(), message.getReceiver() + ": "
+                    + message.getBody(), Toast.LENGTH_SHORT).show();
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -75,6 +93,24 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             backToLogin();
         }
+    }
+
+    //TODO: Manage broadcastReceiver properly throughout the activity lifecycle
+    @Override
+    protected void onResume() {
+        // Register to receive messages.
+        // Registering an observer (mMessageReceiver) to receive Intents
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("receivedMessage"));
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        // Unregister since the activity is paused.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(
+                mMessageReceiver);
+        super.onPause();
     }
 
     @Override
@@ -168,6 +204,8 @@ public class MainActivity extends AppCompatActivity
             if(xmppService != null) {
                 txtHelloUser.setText(xmppService.getXmppManager().getUser().getUsername());
             }
+            //After connection established create chat listener for receiving incoming messages
+            ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
         }
     }
 }

@@ -64,11 +64,10 @@ public class ContactsActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
+        Log.d(TAG, "[onStart CALLED!]");
         Intent i = new Intent(getBaseContext(), XmppService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        LoadRosterTask lrt = new LoadRosterTask();
-        lrt.execute();
+        super.onStart();
     }
 
     @Override
@@ -77,15 +76,15 @@ public class ContactsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contacts);
 
         contactsListView = (ListView)findViewById(R.id.lvContacts);
-        // get data from the table
         customAdapter = new ContactsListAdapter(this,
                 R.layout.contact_list_itemlistrow,
                 entriesList);
-
         contactsListView.setAdapter(customAdapter);
-
         contactsListView.setOnItemClickListener(openChatActivity());
 
+        //Load list of contacts in the screen
+        LoadRosterTask lrt = new LoadRosterTask();
+        lrt.execute();
     }
 
     @Override
