@@ -12,13 +12,13 @@ import br.chatup.tcc.utils.Util;
 /**
  * Created by Luan on 8/14/2016.
  */
-public class MessageService extends Service{
+public class MessageService extends Service {
 
     private static final String TAG = Util.getTagForClass(MessageService.class);
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(TAG, "onBind: ");
+        Log.i(TAG, "onBind");
         return new LocalBinder<MessageService>(this);
     }
 
@@ -26,6 +26,7 @@ public class MessageService extends Service{
         Intent intent = new Intent("receivedMessage");
         // You can also include some extra data.
         intent.putExtra("message", message);
+        Log.i(TAG, "SENDING BROADCAST");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         //sendBroadcast(intent); (BroadcastReceiver)
     }

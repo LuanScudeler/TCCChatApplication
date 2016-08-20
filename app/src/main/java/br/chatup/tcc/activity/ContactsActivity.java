@@ -64,10 +64,21 @@ public class ContactsActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        Log.d(TAG, "[onStart CALLED!]");
-        Intent i = new Intent(getBaseContext(), XmppService.class);
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "ON_START");
+        Intent i = new Intent(ContactsActivity.this, XmppService.class);
+        bindService(i, mConnection, 0);
         super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        unbindService(mConnection);
+        super.onStop();
     }
 
     @Override

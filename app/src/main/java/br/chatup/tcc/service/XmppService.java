@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -28,12 +29,22 @@ public class XmppService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(TAG, "onBind: ");
+        Log.i(TAG, "onBind");
+        Toast.makeText(this, "Service Binded", Toast.LENGTH_LONG).show();
         return new LocalBinder<XmppService>(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        xmppManager.disconnect();
+        super.onDestroy();
+        Log.i(TAG, "onDestroy");
+        Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
     }
 
     public void init(User user) throws XMPPException, IOException, SmackException {

@@ -33,9 +33,9 @@ public class ChatListener implements ChatManagerListener {
             if(!CacheStorage.getInstanceCachedChats().containsKey(chat.getParticipant())){
                 CacheStorage.addChatContact(chat.getParticipant(), chat.getThreadID());
                 chat.addMessageListener(new MessageListener(context));
-                Log.d(TAG, "CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: " + chat.getParticipant() + " ThreadID:" + chat.getThreadID());
+                Log.d(TAG, "[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: " + chat.getParticipant() + " | ThreadID: " + chat.getThreadID());
             }else{
-                Log.d(TAG, "CHAT ALREADY CREATED: " + "Contact: " + chat.getParticipant() + " ThreadID: " + CacheStorage.getInstanceCachedChats().get(chat.getParticipant()));
+                Log.d(TAG, "[CHAT ALREADY OPENED] " + "Contact: " + chat.getParticipant() + " | ThreadID: " + CacheStorage.getInstanceCachedChats().get(chat.getParticipant()));
             }
         }
     }

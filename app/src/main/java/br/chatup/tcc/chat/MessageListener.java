@@ -44,12 +44,12 @@ public class MessageListener implements ChatMessageListener {
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
             messageService = ((LocalBinder<MessageService>) iBinder).getService();
             serviceConnected = true;
-            Log.d(TAG, "[MessageService] onServiceConnected: ");
+            Log.d(TAG, "[MessageService] onServiceConnected");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "[MessageService] onServiceDisconnected: ");
+            Log.d(TAG, "[MessageService] onServiceDisconnected");
         }
     };
 
@@ -59,16 +59,18 @@ public class MessageListener implements ChatMessageListener {
 
     @Override
     public void processMessage(Chat chat, Message message) {
-        Log.d(TAG, "MESSAGE RECEIVED: Body: " + message.getBody() + " - User: " + chat.getParticipant() + " - ThreadID: " + chat.getThreadID());
+        Log.d(TAG, "[MESSAGE RECEIVED] Body: " + message.getBody() + " | User: " + chat.getParticipant() + " | ThreadID: " + chat.getThreadID());
 
-        //Gets from who the message came from
         if (message.getType() == Message.Type.chat && message.getBody() != null) {
             Intent i = new Intent(context, MessageService.class);
-            context.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+            context.bindService(i, mConnection, 0);
             chatMessage = new ChatMessage(message.getBody(), chat.getParticipant(), false, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
+            //TODO: Handle messages that come from a different contact when compared with the current contact of the chatActivity
             while (!serviceConnected);//empty loop to give time for service binding
-            //TODO: Find how to map each contact with its own chat screen
+            Log.d(TAG, "NOTIFYING MESSAGE RECEIVED");
             messageService.notifyMessage(chatMessage);
+            while (!serviceConnected); //empty loop to give time for message be notified
+            context.unbindService(mConnection);
         }
     }
 

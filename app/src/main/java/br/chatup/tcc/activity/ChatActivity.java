@@ -84,25 +84,8 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent i = new Intent(getBaseContext(), XmppService.class);
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_chat);
-
-		edtMessageBody = (EditText) findViewById(R.id.edtMessage);
-        tvContact = (TextView) findViewById(R.id.tvContact);
-        messagesContainer = (ListView) findViewById(R.id.msgListView);
-
-		contactJID = getIntent().getExtras().getString("contactJID").toString();
-		contactFULL_JID = contactJID.concat(FULL_JID_APPEND);
-		Log.d(TAG, "Opening chat with: " + contactFULL_JID);
-
-		tvContact.setText(Util.parseContactName(contactFULL_JID));
-        initChatContainer();
+        Intent i = new Intent(ChatActivity.this, XmppService.class);
+        bindService(i, mConnection, 0);
     }
 
     @Override
@@ -120,6 +103,29 @@ public class ChatActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(
                 mMessageReceiver);
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        unbindService(mConnection);
+        super.onStop();
+    }
+
+    @Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_chat);
+
+		edtMessageBody = (EditText) findViewById(R.id.edtMessage);
+        tvContact = (TextView) findViewById(R.id.tvContact);
+        messagesContainer = (ListView) findViewById(R.id.msgListView);
+
+		contactJID = getIntent().getExtras().getString("contactJID").toString();
+		contactFULL_JID = contactJID.concat(FULL_JID_APPEND);
+		Log.d(TAG, "Opening chat with: " + contactFULL_JID);
+
+		tvContact.setText(Util.parseContactName(contactFULL_JID));
+        initChatContainer();
     }
 
     private void initChatContainer() {
@@ -158,14 +164,14 @@ public class ChatActivity extends AppCompatActivity {
 				newChat = chatManager.createChat(messageReceiver, new MessageListener(ChatActivity.this));
 
                 CacheStorage.addChatContact(messageReceiver,newChat.getThreadID());
-                Log.d(TAG,"CHAT CREATED - Receiver not found in contacts cache, ADDING TO CACHE: Contact: "+messageReceiver+" ThreadID:"+newChat.getThreadID());
+                Log.d(TAG,"[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: "+messageReceiver+" | ThreadID: "+newChat.getThreadID());
             }else {
 				//Get chat threadID from cachedChats for the current contact that the user is chatting with
 				newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactFULL_JID));
 				//Set on message the chat threadID that already exist in the cachedChats
 				message.setThread(CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
 
-				Log.d(TAG, "CONTACT CHAT ALREADY OPEN: Setting threadID for reply: CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
+				Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
 			}
 
 			message.setBody(messageBody);

@@ -38,6 +38,7 @@ import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
+import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Util;
 
@@ -49,7 +50,10 @@ public class MainActivity extends AppCompatActivity
     private ImageView imgViewUserPhoto;
     private ProgressDialog pDialog;
     private static boolean serviceConnected;
+    private boolean created;
+    private boolean connected;
     private static XmppService xmppService;
+    private Intent i;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -78,13 +82,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d(TAG, "ON_START");
         try {
             User user = CacheStorage.getActiveUser(this);
             if (user != null) {
-                Intent i = new Intent(getBaseContext(), XmppService.class);
-                bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+                bindService(i, mConnection, 0);
                 InitConnectionTask iconn = new InitConnectionTask();
-                iconn.execute(user);
+                if (!connected) {
+                    iconn.execute(user);
+                    connected = true;
+                }
             }
             else {
                 backToLogin();
@@ -100,6 +107,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         // Register to receive messages.
         // Registering an observer (mMessageReceiver) to receive Intents
+        Log.d(TAG, "ON_RESUME");
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("receivedMessage"));
         super.onResume();
@@ -107,6 +115,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "ON_PAUSE");
         // Unregister since the activity is paused.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(
                 mMessageReceiver);
@@ -114,9 +123,31 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop() {
+        unbindService(mConnection);
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(i); //Do not stop service here, for receiving message even with the application closed
+        super.onDestroy();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*Starting services, it will be kept started through the whole application. Activities will be able
+        to bind to it when access to service is required*/
+        i = new Intent(getBaseContext(), XmppService.class);
+        Intent i2 = new Intent(getBaseContext(), MessageService.class);
+        //Starting XmppService
+        startService(i);
+        //Starting MessageService
+        startService(i2);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -205,7 +236,11 @@ public class MainActivity extends AppCompatActivity
                 txtHelloUser.setText(xmppService.getXmppManager().getUser().getUsername());
             }
             //After connection established create chat listener for receiving incoming messages
-            ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
+            if(!created) { //TODO: This can probably be removed, asyncTask execution already has a flag called "connected"
+                Toast.makeText(getApplicationContext(), "ChatListener STARTED", Toast.LENGTH_LONG).show();
+                ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
+                created = true;
+            }
         }
     }
 }
