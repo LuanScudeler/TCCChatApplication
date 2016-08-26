@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context="br.chatup.tcc.activity.ContactDetailsActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/unnamed"
+        android:id="@+id/imgvUserPhoto_ContactDetails" />
+
+    <TextView
+        android:id="@+id/txtUsername_ContactDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/meddium_text"
+        android:layout_below="@+id/imgvUserPhoto_ContactDetails"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/txtEmail_ContactDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="#000"
+        android:textSize="@dimen/meddium_text"
+        android:layout_below="@+id/txtUsername_ContactDetails"
+        android:layout_centerHorizontal="true" />
+    <Button
+        android:id="@+id/btnAddContact_ContactDetails"
+        android:text="@string/add_to_contacts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/meddium_text"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
+        android:layout_marginTop="10dp"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/txtEmail_ContactDetails"/>
+
+</RelativeLayout>

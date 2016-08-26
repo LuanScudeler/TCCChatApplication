@@ -52,7 +52,6 @@ public class ChatActivity extends AppCompatActivity {
     private ChatContainerAdapter chatContainerAdapter;
 
     private String contactJID;
-    private String contactFULL_JID;
     private String messageBody;
     private ChatMessage chatMessage;
 
@@ -121,10 +120,8 @@ public class ChatActivity extends AppCompatActivity {
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
 		contactJID = getIntent().getExtras().getString("contactJID").toString();
-		contactFULL_JID = contactJID.concat(FULL_JID_APPEND);
-		Log.d(TAG, "Opening chat with: " + contactFULL_JID);
 
-		tvContact.setText(Util.parseContactName(contactFULL_JID));
+		tvContact.setText(contactJID);
         initChatContainer();
     }
 
@@ -146,7 +143,7 @@ public class ChatActivity extends AppCompatActivity {
     public void btnSendMessageClick(View v) {
 
         messageBody = edtMessageBody.getText().toString();
-        chatMessage = new ChatMessage(messageBody, contactFULL_JID, true, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
+        chatMessage = new ChatMessage(messageBody, contactJID, true, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
 
         sendMessage();
         displayMessage(chatMessage);
@@ -167,11 +164,11 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d(TAG,"[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: "+messageReceiver+" | ThreadID: "+newChat.getThreadID());
             }else {
 				//Get chat threadID from cachedChats for the current contact that the user is chatting with
-				newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactFULL_JID));
+				newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactJID));
 				//Set on message the chat threadID that already exist in the cachedChats
-				message.setThread(CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
+				message.setThread(CacheStorage.getInstanceCachedChats().get(contactJID).toString());
 
-				Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactFULL_JID).toString());
+				Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactJID).toString());
 			}
 
 			message.setBody(messageBody);

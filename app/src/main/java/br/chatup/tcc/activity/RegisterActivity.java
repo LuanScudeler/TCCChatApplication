@@ -56,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
 			email = edtEmail.getText().toString();
 			password = edtPassword.getText().toString();
 
-			User user = new User(username, password, name, email);
+			User user = new User(username, password, name, email, null);
 
 			RegisterTask rAsync = new RegisterTask();
 

@@ -1,6 +1,7 @@
 package br.chatup.tcc.utils;
 
 import android.app.Activity;
+import android.util.Log;
 
 import java.nio.charset.Charset;
 
@@ -41,5 +42,16 @@ public class Util {
 
         return pJID;
     }
+
+    public static boolean anyNull(Object[] fields) {
+        for(Object o : fields)
+            if(o == null) return true;
+        return false;
+    }
+
+   /* public static String getContactJID(String username) {
+        String s = username + "@" +  Constants.XMPP_SERVER_IP;
+        return s;
+    }*/
 
 }

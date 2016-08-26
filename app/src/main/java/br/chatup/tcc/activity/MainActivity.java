@@ -26,8 +26,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.ChatManager;
 
 import java.io.IOException;
@@ -47,19 +45,20 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = Util.getTagForClass(MainActivity.class);
     private TextView txtHelloUser;
+    private TextView txtUsernameNavHeader;
+    private TextView txtEmailNavHeader;
     private ImageView imgViewUserPhoto;
     private ProgressDialog pDialog;
+    private Intent i;
     private static boolean serviceConnected;
     private boolean created;
     private boolean connected;
     private static XmppService xmppService;
-    private Intent i;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             xmppService = ((LocalBinder<XmppService>) iBinder).getService();
             serviceConnected = true;
-            Log.d(TAG, "onServiceConnected: " + xmppService);
         }
 
         @Override
@@ -124,13 +123,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        unbindService(mConnection);
         super.onStop();
+        if(serviceConnected)
+            unbindService(mConnection);
     }
 
     @Override
     protected void onDestroy() {
-        stopService(i); //Do not stop service here, for receiving message even with the application closed
+//        stopService(i); //Do not stop service here, for receiving message even with the application closed
         super.onDestroy();
     }
 
@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         txtHelloUser = (TextView) findViewById(R.id.txtHelloUser);
+        txtUsernameNavHeader = (TextView) findViewById(R.id.txtUsername_NavHeader);
+        txtEmailNavHeader = (TextView) findViewById(R.id.txtEmail_NavHeader);
     }
 
     public void backToLogin() {
@@ -219,11 +221,7 @@ public class MainActivity extends AppCompatActivity
             try {
                 xmppService.init(users[0]);
                 xmppService.connect();
-            } catch (XMPPException e) {
-                Log.e(TAG, "doInBackground: ", e);
-            } catch (IOException e) {
-                Log.e(TAG, "doInBackground: ", e);
-            } catch (SmackException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "doInBackground: ", e);
             }
             return null;
@@ -234,10 +232,18 @@ public class MainActivity extends AppCompatActivity
             pDialog.cancel();
             if(xmppService != null) {
                 txtHelloUser.setText(xmppService.getXmppManager().getUser().getUsername());
+                txtUsernameNavHeader.setText(xmppService.getXmppManager().getUser().getUsername());
+                txtEmailNavHeader.setText(xmppService.getXmppManager().getUser().getEmail());
+                //After connection established create chat listener for receiving incoming messages
+                ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
             }
+            else {
+                CacheStorage.deactivateUser(MainActivity.this);
+                MainActivity.this.backToLogin();
+            }
+
             //After connection established create chat listener for receiving incoming messages
             if(!created) { //TODO: This can probably be removed, asyncTask execution already has a flag called "connected"
-                Toast.makeText(getApplicationContext(), "ChatListener STARTED", Toast.LENGTH_LONG).show();
                 ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
                 created = true;
             }

@@ -16,6 +16,7 @@ import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
 
@@ -54,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 else {
                     XMPPLoginTask xmppTask = new XMPPLoginTask();
-                    User user = new User(username, password, null, null);
+                    User user = new User(username, password, null, null, null);
                     xmppTask.execute(user);
                 }
             }
@@ -91,6 +92,10 @@ public class LoginActivity extends AppCompatActivity {
                     return null;
                 }
                 else {
+                    User u = JsonParser.fromJson(User.class, resp.getBody());
+                    user.setEmail(u.getEmail());
+                    user.setProperties(u.getProperties());
+                    user.setName(u.getName());
                     return user;
                 }
 

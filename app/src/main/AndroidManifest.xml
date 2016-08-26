@@ -38,7 +38,8 @@
         <activity android:name="br.chatup.tcc.activity.ContactsActivity" />
         <activity android:name="br.chatup.tcc.activity.ChatActivity" />
         <activity android:name="br.chatup.tcc.activity.RegisterActivity" />
-        <activity android:name="br.chatup.tcc.activity.SearchContactActivity"></activity>
+        <activity android:name="br.chatup.tcc.activity.SearchContactActivity" />
+        <activity android:name="br.chatup.tcc.activity.ContactDetailsActivity"></activity>
     </application>
 
 </manifest>

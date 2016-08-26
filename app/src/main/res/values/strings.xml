@@ -12,6 +12,9 @@
     <string name="conn_to_srv">Connecting...</string>
     <string name="please_wait">Please wait...</string>
     <string name="confirm">Confirm</string>
+    <string name="search">Search</string>
+    <string name="add_to_contacts">Add to contacts</string>
+
 
     <!-- LoginActivity -->
     <string name="signin">Sign In</string>

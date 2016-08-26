@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:padding="10dp"
     android:orientation="vertical"
+    android:background="@color/white"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="br.chatup.tcc.activity.SearchContactActivity">
 
     <EditText
+        android:id="@+id/edtUsername_SearchContactActivity"
+        android:inputType="text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
-        android:ems="10"
-        android:layout_centerHorizontal="true"
-        android:hint="user name" />
+        android:hint="@string/username"
+        android:layout_marginTop="20dp"/>
 
     <Button
-        android:layout_width="fill_parent"
-        android:layout_height="70dp"
+        android:id="@+id/btnSearch_SearchContactActivity"
+        android:text="@string/search"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_button_height"
+        android:textSize="@dimen/meddium_text"
         android:textColor="@color/white"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        android:text="Search"/>
+        android:background="@color/colorPrimary"
+        android:layout_marginTop="20dp"/>
+
+    <ListView
+        android:id="@+id/lvContactsFound_SearchContactActivity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"/>
+
 </LinearLayout>

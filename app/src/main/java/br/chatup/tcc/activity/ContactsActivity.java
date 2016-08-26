@@ -26,6 +26,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jxmpp.util.XmppStringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -107,8 +108,10 @@ public class ContactsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.search_contacts_item_menu)
-            Toast.makeText(this, "menu selecionado", Toast.LENGTH_SHORT).show();
+        if(item.getItemId() == R.id.search_contacts_item_menu) {
+            Intent i = new Intent(getBaseContext(), SearchContactActivity.class);
+            startActivity(i);
+        }
         return true;
     }
 
@@ -117,7 +120,8 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // selected item
-                String contactJIDSelected = ((TextView) view.findViewById(R.id.userJID)).getText().toString();
+                String contactJIDSelected = entriesList.get(position).getUser();
+                Log.i(TAG, "onItemClick: " + contactJIDSelected);
                 Intent i = new Intent(ContactsActivity.this, ChatActivity.class);
                 i.putExtra("contactJID", contactJIDSelected);
                 startActivity(i);
@@ -187,8 +191,8 @@ public class ContactsActivity extends AppCompatActivity {
             startRosterPresenceListener(roster);
 
             //Add a roster to the current user for testing purposes
-            //String userJID = "a@192.168.0.103";
-            //String nickName = "a";
+            //String userJID = "luan@10.172.32.71";
+            //String nickName = "luan";
             //addUserForTest(roster, userJID, nickName);
 
             //Get all rosters

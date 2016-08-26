@@ -20,11 +20,14 @@ public class User implements Serializable {
 
     private String email;
 
-    public User(String username, String password, String name, String email) {
+    private String properties; 
+
+    public User(String username, String password, String name, String email, String properties) {
         this.username = username;
         this.password = password;
         this.name = name;
         this.email = email;
+        this.properties = properties;
     }
 
     public String getUsername() {
@@ -59,26 +62,40 @@ public class User implements Serializable {
         this.email = email;
     }
 
+    public String getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String properties) {
+        this.properties = properties;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof User)) return false;
 
         User user = (User) o;
 
-        if (!username.equals(user.username)) return false;
-        if (!password.equals(user.password)) return false;
-        if (!name.equals(user.name)) return false;
-        return email.equals(user.email);
+        if (getUsername() != null ? !getUsername().equals(user.getUsername()) : user.getUsername() != null)
+            return false;
+        if (getPassword() != null ? !getPassword().equals(user.getPassword()) : user.getPassword() != null)
+            return false;
+        if (getName() != null ? !getName().equals(user.getName()) : user.getName() != null)
+            return false;
+        if (getEmail() != null ? !getEmail().equals(user.getEmail()) : user.getEmail() != null)
+            return false;
+        return getProperties() != null ? getProperties().equals(user.getProperties()) : user.getProperties() == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = username.hashCode();
-        result = 31 * result + password.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + email.hashCode();
+        int result = getUsername() != null ? getUsername().hashCode() : 0;
+        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+        result = 31 * result + (getEmail() != null ? getEmail().hashCode() : 0);
+        result = 31 * result + (getProperties() != null ? getProperties().hashCode() : 0);
         return result;
     }
 
@@ -89,6 +106,7 @@ public class User implements Serializable {
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", properties='" + properties + '\'' +
                 '}';
     }
 }
