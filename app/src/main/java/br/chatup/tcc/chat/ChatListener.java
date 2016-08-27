@@ -30,14 +30,18 @@ public class ChatListener implements ChatManagerListener {
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
         if (!createdLocally) {
-            if(!CacheStorage.getInstanceCachedChats().containsKey(chat.getParticipant())){
-                CacheStorage.addChatContact(chat.getParticipant(), chat.getThreadID());
+            final String chatParticipant = chat.getParticipant();
+            if(!CacheStorage.getInstanceCachedChats().containsKey(chatParticipant)){
+                CacheStorage.addChatContact(chatParticipant, chat.getThreadID());
                 chat.addMessageListener(new MessageListener(context));
-                Log.d(TAG, "[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: " + chat.getParticipant() + " | ThreadID: " + chat.getThreadID());
+                Log.d(TAG, "[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: " + chatParticipant + " | ThreadID: " + chat.getThreadID());
             }else{
-                Log.d(TAG, "[CHAT ALREADY OPENED] " + "Contact: " + chat.getParticipant() + " | ThreadID: " + CacheStorage.getInstanceCachedChats().get(chat.getParticipant()));
+                Log.d(TAG, "[CHAT ALREADY OPENED] " + "Contact: " + chat.getParticipant() + " | ThreadID: " + CacheStorage.getInstanceCachedChats().get(chatParticipant));
             }
+        }else {
+            Log.d(TAG, "[CHAT Created locally] Echo disabled");
         }
+
     }
 }
 

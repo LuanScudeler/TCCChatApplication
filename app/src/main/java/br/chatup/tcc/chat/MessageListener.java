@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
@@ -14,6 +15,8 @@ import android.widget.ListView;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.chatstates.ChatState;
+import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jxmpp.util.XmppDateTime;
 
 import java.util.ArrayList;
@@ -32,29 +35,19 @@ import br.chatup.tcc.utils.JsonParser;
  * Created by Luan on 5/8/2016..
  */
 //TODO: Investigate if MessageListener can be instantiated multiple times
-public class MessageListener implements ChatMessageListener {
+public class MessageListener implements ChatMessageListener, ChatStateListener {
 
     private static final String TAG = Constants.LOG_TAG + MessageListener.class.getSimpleName();
     private ChatMessage chatMessage;
     private Context context;
-    private MessageService messageService;
-    private static boolean serviceConnected;
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder iBinder) {
-            messageService = ((LocalBinder<MessageService>) iBinder).getService();
-            serviceConnected = true;
-            Log.d(TAG, "[MessageService] onServiceConnected");
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "[MessageService] onServiceDisconnected");
-        }
-    };
 
     public MessageListener(Context context) {
         this.context = context;
+    }
+
+    @Override
+    public void stateChanged(Chat chat, ChatState state) {
+        //Can be used to broadcast to gui state changes of the chat
     }
 
     @Override
@@ -62,15 +55,12 @@ public class MessageListener implements ChatMessageListener {
         Log.d(TAG, "[MESSAGE RECEIVED] Body: " + message.getBody() + " | User: " + chat.getParticipant() + " | ThreadID: " + chat.getThreadID());
 
         if (message.getType() == Message.Type.chat && message.getBody() != null) {
-            Intent i = new Intent(context, MessageService.class);
-            context.bindService(i, mConnection, 0);
             chatMessage = new ChatMessage(message.getBody(), chat.getParticipant(), false, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
-            //TODO: Handle messages that come from a different contact when compared with the current contact of the chatActivity
-            while (!serviceConnected);//empty loop to give time for service binding
+
             Log.d(TAG, "NOTIFYING MESSAGE RECEIVED");
-            messageService.notifyMessage(chatMessage);
-            while (!serviceConnected); //empty loop to give time for message be notified
-            context.unbindService(mConnection);
+            Intent intent = new Intent("receivedMessage");
+            intent.putExtra("message", chatMessage);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
     }
 

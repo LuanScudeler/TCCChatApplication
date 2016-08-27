@@ -1,9 +1,12 @@
 package br.chatup.tcc.xmpp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
@@ -14,6 +17,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
+import br.chatup.tcc.activity.MainActivity;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.utils.Constants;
@@ -26,9 +30,9 @@ public class XmppManager {
 
     private static final String TAG = Util.getTagForClass(XmppManager.class);
 
-    private XMPPTCPConnection conn = null;
+    private static AbstractXMPPConnection conn;
     private static final Integer REPLAY_TIMEOUT = 20000;
-    private User user;
+    private static User user;
 
     public XmppManager(User user) {
         this.user = user;
@@ -91,6 +95,11 @@ public class XmppManager {
 
     public void connect() {
         AsyncTask<Void, Void, Void> connThread = new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected void onPreExecute() {
+                //TODO: Raise dialog to inform that connection is in progress (How to get context from here)
+            }
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
@@ -111,5 +120,5 @@ public class XmppManager {
 
     public User getUser() {return user;}
 
-    public XMPPTCPConnection getConn(){ return conn; }
+    public static AbstractXMPPConnection  getConn(){ return conn; }
 }

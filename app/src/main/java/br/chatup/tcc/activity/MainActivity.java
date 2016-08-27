@@ -26,14 +26,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jivesoftware.smack.chat.ChatManager;
-
 import java.io.IOException;
 
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
-import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.MessageService;
@@ -49,11 +46,12 @@ public class MainActivity extends AppCompatActivity
     private TextView txtEmailNavHeader;
     private ImageView imgViewUserPhoto;
     private ProgressDialog pDialog;
-    private Intent i;
+    private Intent xmppServiceIntent;
     private static boolean serviceConnected;
     private boolean created;
     private boolean connected;
     private static XmppService xmppService;
+    private User user;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -82,23 +80,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "ON_START");
-        try {
-            User user = CacheStorage.getActiveUser(this);
-            if (user != null) {
-                bindService(i, mConnection, 0);
-                InitConnectionTask iconn = new InitConnectionTask();
-                if (!connected) {
-                    iconn.execute(user);
-                    connected = true;
-                }
-            }
-            else {
-                backToLogin();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            backToLogin();
-        }
+        bindService(xmppServiceIntent, mConnection, 0);
     }
 
     //TODO: Manage broadcastReceiver properly throughout the activity lifecycle
@@ -130,7 +112,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-//        stopService(i); //Do not stop service here, for receiving message even with the application closed
+        //stopService(xmppServiceIntent); //Do not stop service here, for receiving message even with the application closed
         super.onDestroy();
     }
 
@@ -139,14 +121,35 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*Starting services, it will be kept started through the whole application. Activities will be able
-        to bind to it when access to service is required*/
-        i = new Intent(getBaseContext(), XmppService.class);
-        Intent i2 = new Intent(getBaseContext(), MessageService.class);
-        //Starting XmppService
-        startService(i);
-        //Starting MessageService
-        startService(i2);
+        txtHelloUser = (TextView) findViewById(R.id.txtHelloUser);
+        txtUsernameNavHeader = (TextView) findViewById(R.id.txtUsername_NavHeader);
+        txtEmailNavHeader = (TextView) findViewById(R.id.txtEmail_NavHeader);
+
+        try {
+            user = CacheStorage.getActiveUser(this);
+
+            if (user != null) {
+                xmppServiceIntent = new Intent(getBaseContext(), XmppService.class);
+                xmppServiceIntent.putExtra("user", user);
+                if (!connected) {
+                    /*Starting services, it will be kept started through the whole application. Activities will be able
+                    to bind to it when access to service is required*/
+                    startService(xmppServiceIntent);
+                    connected = true;
+                }
+            }
+            else {
+                backToLogin();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            backToLogin();
+        }
+
+        //Initialize values on gui
+        txtHelloUser.setText(user.getUsername());
+        txtUsernameNavHeader.setText(user.getUsername());
+        txtEmailNavHeader.setText(user.getEmail());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -165,9 +168,6 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        txtHelloUser = (TextView) findViewById(R.id.txtHelloUser);
-        txtUsernameNavHeader = (TextView) findViewById(R.id.txtUsername_NavHeader);
-        txtEmailNavHeader = (TextView) findViewById(R.id.txtEmail_NavHeader);
     }
 
     public void backToLogin() {
@@ -204,49 +204,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    public class InitConnectionTask extends AsyncTask<User, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Connecting...");
-            pDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(User... users) {
-            while (!serviceConnected);//empty loop to give time for service binding
-            try {
-                xmppService.init(users[0]);
-                xmppService.connect();
-            } catch (Exception e) {
-                Log.e(TAG, "doInBackground: ", e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void status) {
-            pDialog.cancel();
-            if(xmppService != null) {
-                txtHelloUser.setText(xmppService.getXmppManager().getUser().getUsername());
-                txtUsernameNavHeader.setText(xmppService.getXmppManager().getUser().getUsername());
-                txtEmailNavHeader.setText(xmppService.getXmppManager().getUser().getEmail());
-                //After connection established create chat listener for receiving incoming messages
-                ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
-            }
-            else {
-                CacheStorage.deactivateUser(MainActivity.this);
-                MainActivity.this.backToLogin();
-            }
-
-            //After connection established create chat listener for receiving incoming messages
-            if(!created) { //TODO: This can probably be removed, asyncTask execution already has a flag called "connected"
-                ChatManager.getInstanceFor(xmppService.getXmppManager().getConn()).addChatListener(new ChatListener(MainActivity.this));
-                created = true;
-            }
-        }
     }
 }

@@ -49,9 +49,6 @@ public class Util {
         return false;
     }
 
-   /* public static String getContactJID(String username) {
-        String s = username + "@" +  Constants.XMPP_SERVER_IP;
-        return s;
-    }*/
+
 
 }

@@ -23,7 +23,9 @@ import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jxmpp.stringprep.XmppStringPrepUtil;
 import org.jxmpp.util.XmppDateTime;
+import org.jxmpp.util.XmppStringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,7 +78,12 @@ public class ChatActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
             Log.d(TAG, "[BroadcastReceiver] Message received: " + message.getBody());
-            displayMessage(message);
+            if(XmppStringUtils.parseLocalpart(message.getReceiver()).equals(XmppStringUtils.parseLocalpart(contactJID)))
+                displayMessage(message);
+            else {
+                Log.d(TAG, "[BroadcastReceiver] Raising notification");
+                //TODO: Raise notification to start chat with a different contact from the current one
+            }
         }
     };
 
@@ -154,11 +161,11 @@ public class ChatActivity extends AppCompatActivity {
 		if(!messageBody.equalsIgnoreCase("")) {
 			final Message message = new Message();
 			ChatManager chatManager = ChatManager.getInstanceFor(xmppService.getXmppManager().getConn());
-			//Gets for whom the message will go for (retrieves a user JID)
+			//Gets for whom the message will go for (retrieves a user JID: username@domain)
 			String messageReceiver = chatMessage.getReceiver();
 
 			if(!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
-				newChat = chatManager.createChat(messageReceiver, new MessageListener(ChatActivity.this));
+				newChat = chatManager.createChat(messageReceiver);
 
                 CacheStorage.addChatContact(messageReceiver,newChat.getThreadID());
                 Log.d(TAG,"[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: "+messageReceiver+" | ThreadID: "+newChat.getThreadID());

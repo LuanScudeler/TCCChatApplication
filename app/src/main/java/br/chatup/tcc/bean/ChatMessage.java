@@ -16,7 +16,7 @@ public class ChatMessage implements Serializable{
 
     /*
     * @param body message body.
-    * @param receiver contact that will receive the message.
+    * @param receiver contact which the message came from or will go for.
     * */
 
     public ChatMessage(String body, String receiver, boolean isMe, String date) {
