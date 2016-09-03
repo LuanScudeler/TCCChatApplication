@@ -58,8 +58,13 @@ public class XmppService extends Service {
             User user = (User)intent.getSerializableExtra("user");
             Log.i(TAG, "User :" + user);
             xmppManager = new XmppManager((User)intent.getSerializableExtra("user"));
-            xmppManager.init();
-            xmppManager.connect();
+            if(!connected){
+                xmppManager.init();
+                xmppManager.connect();
+                connected = true;
+            } else {
+                Log.i(TAG, "Already connected to server");
+            }
         } catch (XMPPException e) {
             e.printStackTrace();
         } catch (IOException e) {

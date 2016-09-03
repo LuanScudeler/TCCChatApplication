@@ -18,18 +18,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jxmpp.util.XmppDateTime;
-
-import java.util.ArrayList;
 import java.util.Date;
-
-import br.chatup.tcc.activity.ChatActivity;
-import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
-import br.chatup.tcc.myapplication.R;
-import br.chatup.tcc.service.LocalBinder;
-import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.utils.Constants;
-import br.chatup.tcc.utils.JsonParser;
 
 /**
  * Created by Luan on 5/8/2016..
@@ -58,10 +49,10 @@ public class MessageListener implements ChatMessageListener, ChatStateListener {
             chatMessage = new ChatMessage(message.getBody(), chat.getParticipant(), false, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
 
             Log.d(TAG, "NOTIFYING MESSAGE RECEIVED");
+            //TODO: Create a broadcastReceiver for notifying user even when application is closed
             Intent intent = new Intent("receivedMessage");
             intent.putExtra("message", chatMessage);
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
     }
-
 }

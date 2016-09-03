@@ -1,5 +1,6 @@
 package br.chatup.tcc.activity;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -47,14 +48,13 @@ import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.Util;
 
-
+//TODO: Retrieve chat history when loading chatActivity
 public class ChatActivity extends AppCompatActivity {
 
 	private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
 	private static final String FULL_JID_APPEND = Constants.FULL_JID_APPEND;
 
 	private EditText edtMessageBody;
-	private TextView tvContact;
 	private Chat newChat;
     private ListView messagesContainer;
     private ChatContainerAdapter chatContainerAdapter;
@@ -79,28 +79,39 @@ public class ChatActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     *  FullJID composed by localPart@Domain/Resource
+     *
+     *  localPart: username
+     *  Domain: Server address
+     *  Resource: "/Smack"
+     */
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
-            Log.d(TAG, "[BroadcastReceiver] Message received: " + message.getBody());
-            if(XmppStringUtils.parseLocalpart(message.getReceiver()).equals(XmppStringUtils.parseLocalpart(contactJID)))
+            Log.d(TAG, "[BroadcastReceiver] Message received | From: "+ message.getReceiver() + " | Body: "+ message.getBody());
+
+            String senderUsername = XmppStringUtils.parseLocalpart(message.getReceiver());
+            if(senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID)))
                 displayMessage(message);
             else {
                 Log.d(TAG, "[BroadcastReceiver] Raising notification");
-                raiseNotification();
+                String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
+                raiseNotification(contactJID, message.getBody());
             }
         }
     };
 
     //TODO: Fix bugs with listener when accessing the notification and pass the required values for the activity (intent)
-    private void raiseNotification() {
+    private void raiseNotification(String contactJID, String msgBody) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-            .setSmallIcon(R.drawable.notification_icon_mdpi)
-            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_icon_xhdpi))
-            .setTicker("New message!")
-            .setContentTitle("Message from [contact]")
-            .setContentText("[Message content]");
+                .setSmallIcon(R.drawable.notification_icon_mdpi)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_icon_xhdpi))
+                .setTicker("New message!")
+                .setContentTitle("Message from: " + XmppStringUtils.parseLocalpart(contactJID))
+                .setContentText(msgBody)
+                .setAutoCancel(true);
 
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, ChatActivity.class);
@@ -112,10 +123,10 @@ public class ChatActivity extends AppCompatActivity {
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(ChatActivity.class);
-
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
 
         // Get Android notification service
@@ -165,12 +176,12 @@ public class ChatActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_chat);
 
 		edtMessageBody = (EditText) findViewById(R.id.edtMessage);
-        tvContact = (TextView) findViewById(R.id.tvContact);
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
 		contactJID = getIntent().getExtras().getString("contactJID").toString();
+        String displayableUsername = Util.toCapital(XmppStringUtils.parseLocalpart(contactJID));
+        ChatActivity.this.setTitle(displayableUsername);
 
-		tvContact.setText(contactJID);
         initChatContainer();
     }
 
@@ -205,6 +216,8 @@ public class ChatActivity extends AppCompatActivity {
 			ChatManager chatManager = ChatManager.getInstanceFor(xmppService.getXmppManager().getConn());
 			//Gets for whom the message will go for (retrieves a user JID: username@domain)
 			String messageReceiver = chatMessage.getReceiver();
+
+            Log.d(TAG,"[SENDING] Sending message to: " + messageReceiver);
 
 			if(!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
 				newChat = chatManager.createChat(messageReceiver);

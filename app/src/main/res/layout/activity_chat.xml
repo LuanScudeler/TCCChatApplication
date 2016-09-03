@@ -18,7 +18,7 @@
         android:paddingBottom="10dp"
         android:text="Hello"
         android:layout_above="@+id/linearLayout"
-        android:layout_below="@+id/tvContact" />
+    />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,17 +51,4 @@
             android:background="@drawable/send_button"
             android:text="d" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:background="@android:color/holo_blue_light"
-        android:text="CONTACT"
-        android:textAlignment="center"
-        android:id="@+id/tvContact"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
-
 </RelativeLayout>

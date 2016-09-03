@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -33,7 +32,6 @@ import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
-import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Util;
 
@@ -49,7 +47,6 @@ public class MainActivity extends AppCompatActivity
     private Intent xmppServiceIntent;
     private static boolean serviceConnected;
     private boolean created;
-    private boolean connected;
     private static XmppService xmppService;
     private User user;
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -131,12 +128,10 @@ public class MainActivity extends AppCompatActivity
             if (user != null) {
                 xmppServiceIntent = new Intent(getBaseContext(), XmppService.class);
                 xmppServiceIntent.putExtra("user", user);
-                if (!connected) {
-                    /*Starting services, it will be kept started through the whole application. Activities will be able
-                    to bind to it when access to service is required*/
-                    startService(xmppServiceIntent);
-                    connected = true;
-                }
+                /*Starting services, it will be kept started through the whole application. Activities will be able
+                to bind to it when access to service is required*/
+                Log.d(TAG, "STARTING SERVICE");
+                startService(xmppServiceIntent);
             }
             else {
                 backToLogin();
@@ -147,8 +142,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         //Initialize values on gui
-        txtHelloUser.setText(user.getUsername());
-        txtUsernameNavHeader.setText(user.getUsername());
+        String displayableUsername = Util.toCapital(user.getUsername());
+        txtHelloUser.setText(displayableUsername);
+        txtUsernameNavHeader.setText(displayableUsername);
         txtEmailNavHeader.setText(user.getEmail());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
