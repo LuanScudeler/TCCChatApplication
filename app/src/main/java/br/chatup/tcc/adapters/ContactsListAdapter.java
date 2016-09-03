@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.jivesoftware.smack.roster.RosterEntry;
+import org.jxmpp.util.XmppStringUtils;
 
 import java.util.List;
 
@@ -45,15 +46,13 @@ public class ContactsListAdapter extends ArrayAdapter<RosterEntry>{
 
         if (item != null) {
             TextView tvNickname = (TextView) v.findViewById(R.id.nickname);
-            TextView tvPresence = (TextView) v.findViewById(R.id.presence);
-            TextView tvUserJID = (TextView) v.findViewById(R.id.userJID);
+            TextView txtName = (TextView) v.findViewById(R.id.txtName_ItemList);
+            //TextView tvPresence = (TextView) v.findViewById(R.id.presence);
 
-            if(tvNickname != null)
-                tvNickname.setText(item.getName());
-            if(tvPresence != null)
-                tvPresence.setText("Presence-TODO");
-            if(tvUserJID != null)
-                tvUserJID.setText(item.getUser());
+            txtName.setText(item.getName());
+            tvNickname.setText(item.getUser().split("@")[0]);
+            /*if(tvPresence != null)
+                tvPresence.setText("TODO");*/
         }
 
         return v;

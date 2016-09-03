@@ -115,8 +115,8 @@ public class ContactDetailsActivity extends AppCompatActivity {
             User user = params[0];
 
             try {
-
                 String jid = XmppStringUtils.completeJidFrom(user.getUsername(), xmppService.getXmppManager().getConn().getServiceName());
+                Log.i(TAG, "doInBackground: Adding: " + user.getName() + " jid: " + jid);
                 roster.createEntry(jid, user.getName(), null);
             } catch (SmackException.NotLoggedInException e) {
                 Log.e(TAG, "doInBackground: ", e);

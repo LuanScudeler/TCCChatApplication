@@ -1,42 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content" android:orientation="vertical"
-    android:layout_width="fill_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
 
-    <TableRow android:layout_width="fill_parent"
-        android:id="@+id/TableRow01"
-        android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgViewUser"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/user" />
 
-        <TextView android:textColor="#000000"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:id="@+id/txtName_ItemList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name Name Name"
+            android:layout_marginTop="5dp"
+            android:textColor="#000"/>
+
+        <TextView android:textColor="#777"
             android:id="@+id/nickname"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="nickname" android:textStyle="bold"
-            android:gravity="left"
-            android:layout_weight="1"
-            android:typeface="monospace"
-            android:height="40sp" />
-    </TableRow>
+            android:text="nickname"/>
+    </LinearLayout>
 
-    <TableRow android:layout_height="wrap_content"
-        android:layout_width="fill_parent">
-
-        <TextView android:textColor="#000000"
-            android:id="@+id/presence"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="presence"
-            android:layout_weight="1"
-            android:height="20sp" />
-
-        <TextView android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:textColor="#000000"
-            android:gravity="right"
-            android:id="@+id/userJID"
-            android:text="userJID"
-            android:height="20sp" />
-    </TableRow>
-
-</TableLayout>
+</LinearLayout>

@@ -21,6 +21,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -89,13 +92,19 @@ public class SearchContactActivity extends AppCompatActivity {
         @Override
         protected List<User> doInBackground(String... params) {
             List<User> users = new ArrayList<User>();
-            Map<String, String> p = new HashMap<String, String>();
             ResponseEntity<String> s = RestFacade.get(Constants.RESTAPI_USER_URL + "?search="+params[0]);
             try {
-                String str = s.getBody();
-                str = "[" + str.split("\\[")[1].split("\\]")[0] + "]";
-                User[] usr = JsonParser.fromJson(User[].class, str);
-                users = Arrays.asList(usr);
+                com.google.gson.JsonParser jp = new com.google.gson.JsonParser();
+                JsonObject jobj = jp.parse(s.getBody()).getAsJsonObject();
+                String objs = jobj.get("user").toString();
+                if(objs.contains("[")) {
+                    User[] usr = JsonParser.fromJson(User[].class, objs);
+                    users = Arrays.asList(usr);
+                }
+                else {
+                    users.add(JsonParser.fromJson(User.class,objs));
+                }
+
             }
             catch (Exception e) {
                 Log.e(TAG, "doInBackground: ", e);

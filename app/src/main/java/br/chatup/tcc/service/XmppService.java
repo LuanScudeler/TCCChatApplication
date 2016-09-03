@@ -35,13 +35,13 @@ public class XmppService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind");
-        Toast.makeText(this, "Service Binded | Initializing listener", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service Binded | Initializing listener", Toast.LENGTH_LONG).show();
         connection = XmppManager.getConn();
         initializeChatListener();
         return new LocalBinder<XmppService>(this);
@@ -80,7 +80,6 @@ public class XmppService extends Service {
         xmppManager.disconnect();
         super.onDestroy();
         Log.i(TAG, "onDestroy");
-        Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
     }
 
     public void init(User user) throws XMPPException, IOException, SmackException {
