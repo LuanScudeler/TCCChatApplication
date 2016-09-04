@@ -19,6 +19,10 @@ public class ChatMessage implements Serializable{
     * @param receiver contact which the message came from or will go for.
     * */
 
+    public ChatMessage() {
+
+    }
+
     public ChatMessage(String body, String receiver, boolean isMe, String date) {
         this.body = body;
         this.receiver = receiver;

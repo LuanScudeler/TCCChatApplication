@@ -34,14 +34,17 @@ import org.jxmpp.stringprep.XmppStringPrepUtil;
 import org.jxmpp.util.XmppDateTime;
 import org.jxmpp.util.XmppStringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.cache.CacheStorage;
 
 import br.chatup.tcc.chat.MessageListener;
+import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
@@ -52,7 +55,6 @@ import br.chatup.tcc.utils.Util;
 public class ChatActivity extends AppCompatActivity {
 
 	private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
-	private static final String FULL_JID_APPEND = Constants.FULL_JID_APPEND;
 
 	private EditText edtMessageBody;
 	private Chat newChat;
@@ -62,6 +64,7 @@ public class ChatActivity extends AppCompatActivity {
     private String contactJID;
     private String messageBody;
     private ChatMessage chatMessage;
+    private AppDataSource db;
 
     private static boolean serviceConnected;
     private static XmppService xmppService;
@@ -97,6 +100,7 @@ public class ChatActivity extends AppCompatActivity {
                 displayMessage(message);
             else {
                 Log.d(TAG, "[BroadcastReceiver] Raising notification");
+                //For communication to work when opening a chat contactJid must be in bareJid format
                 String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
                 raiseNotification(contactJID, message.getBody());
             }
@@ -175,6 +179,7 @@ public class ChatActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
 
+        db = new AppDataSource(this);
 		edtMessageBody = (EditText) findViewById(R.id.edtMessage);
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
@@ -182,12 +187,24 @@ public class ChatActivity extends AppCompatActivity {
         String displayableUsername = Util.toCapital(XmppStringUtils.parseLocalpart(contactJID));
         ChatActivity.this.setTitle(displayableUsername);
 
-        initChatContainer();
+        initChatView();
+        initChatData();
     }
 
-    private void initChatContainer() {
+    private void initChatView() {
         chatContainerAdapter = new ChatContainerAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(chatContainerAdapter);
+    }
+
+    private void initChatData() {
+        //Retrieves chat history
+        List<ChatMessage> chatMessageList;
+        chatMessageList = db.findAllByContact(XmppStringUtils.parseLocalpart(contactJID));
+        for(ChatMessage chatMessage : chatMessageList) {
+            chatContainerAdapter.add(chatMessage);
+        }
+        ((ChatContainerAdapter) messagesContainer.getAdapter()).notifyDataSetChanged();
+        scroll();
     }
 
     public void displayMessage(ChatMessage message) {
@@ -203,7 +220,8 @@ public class ChatActivity extends AppCompatActivity {
     public void btnSendMessageClick(View v) {
 
         messageBody = edtMessageBody.getText().toString();
-        chatMessage = new ChatMessage(messageBody, contactJID, true, XmppDateTime.DateFormatType.XEP_0082_TIME_PROFILE.format(new Date()));
+        String time = new SimpleDateFormat("HH:mm").format(new Date());
+        chatMessage = new ChatMessage(messageBody, contactJID, true, time);
 
         sendMessage();
         displayMessage(chatMessage);
@@ -217,7 +235,7 @@ public class ChatActivity extends AppCompatActivity {
 			//Gets for whom the message will go for (retrieves a user JID: username@domain)
 			String messageReceiver = chatMessage.getReceiver();
 
-            Log.d(TAG,"[SENDING] Sending message to: " + messageReceiver);
+            Log.d(TAG, "[SENDING] Sending message to: " + messageReceiver);
 
 			if(!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
 				newChat = chatManager.createChat(messageReceiver);
@@ -236,11 +254,22 @@ public class ChatActivity extends AppCompatActivity {
 			message.setBody(messageBody);
 			message.setType(Message.Type.chat);
 
+            Boolean success = true;
 			try {
 				newChat.sendMessage(message);
 			} catch(SmackException.NotConnectedException e) {
+                success = false;
 				e.printStackTrace();
-			}
+			} catch (Exception e){
+                success = false;
+                e.printStackTrace();
+            }
+            //Save messages history
+            if(success) {
+                //"contact" in database must be only de username portion of the JID
+                chatMessage.setReceiver(XmppStringUtils.parseLocalpart(chatMessage.getReceiver()));
+                db.insert(chatMessage);
+            }
 		}
 	}
 
