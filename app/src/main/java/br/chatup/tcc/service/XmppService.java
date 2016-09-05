@@ -135,7 +135,7 @@ public class XmppService extends Service {
                 .setSmallIcon(R.drawable.notification_icon_mdpi)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_icon_xhdpi))
                 .setTicker("New message!")
-                .setContentTitle("Message from: " + XmppStringUtils.parseLocalpart(contactJID))
+                .setContentTitle(XmppStringUtils.parseLocalpart(contactJID))
                 .setContentText(msgBody)
                 .setAutoCancel(true);
 

@@ -48,6 +48,7 @@ import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
+import br.chatup.tcc.utils.App;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.Util;
 
@@ -55,7 +56,6 @@ import br.chatup.tcc.utils.Util;
 public class ChatActivity extends AppCompatActivity {
 
 	private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
-
 	private EditText edtMessageBody;
 	private Chat newChat;
     private ListView messagesContainer;
@@ -65,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
     private String messageBody;
     private ChatMessage chatMessage;
     private AppDataSource db;
+    private String currActiveChat;
 
     private static boolean serviceConnected;
     private static XmppService xmppService;
@@ -107,13 +108,13 @@ public class ChatActivity extends AppCompatActivity {
         }
     };
 
-    //TODO: Fix bugs with listener when accessing the notification and pass the required values for the activity (intent)
+    //TODO: Move raiseNotification method to Utils class
     private void raiseNotification(String contactJID, String msgBody) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification_icon_mdpi)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_icon_xhdpi))
                 .setTicker("New message!")
-                .setContentTitle("Message from: " + XmppStringUtils.parseLocalpart(contactJID))
+                .setContentTitle(XmppStringUtils.parseLocalpart(contactJID))
                 .setContentText(msgBody)
                 .setAutoCancel(true);
 
@@ -157,6 +158,10 @@ public class ChatActivity extends AppCompatActivity {
         // Registering an observer (mMessageReceiver) to receive Intents
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("receivedMessage"));
+
+        App.setCurrentActivity(this);
+        App.setCurrentActiveChat(currActiveChat);
+
         super.onResume();
     }
 
@@ -165,6 +170,9 @@ public class ChatActivity extends AppCompatActivity {
         // Unregister since the activity is paused.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(
                 mMessageReceiver);
+
+        clearReferences();
+
         super.onPause();
     }
 
@@ -172,6 +180,14 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStop() {
         unbindService(mConnection);
         super.onStop();
+    }
+
+    private void clearReferences(){
+        Activity currActivity = App.getCurrentActivity();
+        if (this.equals(currActivity) && currActiveChat.equals(App.getCurrentActiveChat())){
+            App.setCurrentActivity(null);
+            App.setCurrentActiveChat(null);
+        }
     }
 
     @Override
@@ -184,6 +200,9 @@ public class ChatActivity extends AppCompatActivity {
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
 		contactJID = getIntent().getExtras().getString("contactJID").toString();
+        //username for controlling notification behavior
+        currActiveChat = XmppStringUtils.parseLocalpart(contactJID);
+
         String displayableUsername = Util.toCapital(XmppStringUtils.parseLocalpart(contactJID));
         ChatActivity.this.setTitle(displayableUsername);
 
