@@ -35,6 +35,7 @@ import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
+import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 
 public class MainActivity extends AppCompatActivity
@@ -134,7 +135,9 @@ public class MainActivity extends AppCompatActivity
                 txtUsernameNavHeader.setText(user.getUsername());
                 txtEmailNavHeader.setText(user.getEmail());
                 xmppServiceIntent = new Intent(getBaseContext(), XmppService.class);
-                xmppServiceIntent.putExtra("user", user);
+                xmppServiceIntent.putExtra("user", JsonParser.toJson(user));
+                //Initialize values on gui
+                String displayableUsername = Util.toCapital(user.getUsername());
                 if (!connected) {
                     /*Starting services, it will be kept started through the whole application. Activities will be able
                     to bind to it when access to service is required*/
@@ -149,9 +152,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             backToLogin();
         }
-
-        //Initialize values on gui
-        String displayableUsername = Util.toCapital(user.getUsername());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

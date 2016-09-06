@@ -27,16 +27,21 @@ import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
 import org.jxmpp.util.XmppStringUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import br.chatup.tcc.adapters.ContactsListAdapter;
+import br.chatup.tcc.bean.User;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.JsonParser;
+import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
 import br.chatup.tcc.xmpp.XmppManager;
 
@@ -117,14 +122,36 @@ public class ContactsActivity extends AppCompatActivity {
 
     private AdapterView.OnItemClickListener openChatActivity() {
         return(new AdapterView.OnItemClickListener() {
+            String contactJIDSelected;
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // selected item
-                String contactJIDSelected = entriesList.get(position).getUser();
+                contactJIDSelected = entriesList.get(position).getUser();
                 Log.i(TAG, "onItemClick: " + contactJIDSelected);
-                Intent i = new Intent(ContactsActivity.this, ChatActivity.class);
-                i.putExtra("contactJID", contactJIDSelected);
-                startActivity(i);
+                new AsyncTask<Void, Void, String>() {
+                    @Override
+                    protected void onPreExecute() {
+                        pDialog = new ProgressDialog(ContactsActivity.this);
+                        pDialog.setMessage(Util.getStringResource(ContactsActivity.this, R.string.please_wait));
+                        pDialog.show();
+                    }
+
+                    @Override
+                    protected String doInBackground(Void... params) {
+                        ResponseEntity<String> resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJIDSelected.split("@")[0]));
+                        User u = JsonParser.fromJson(User.class, resp.getBody());
+                        Log.i(TAG, "doInBackground: " + u);
+                        return u.getProperties().get("property").getValue();
+                    }
+
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Intent i = new Intent(ContactsActivity.this, ChatActivity.class);
+                        i.putExtra("contactJID", contactJIDSelected);
+                        i.putExtra("langTo", s);
+                        startActivity(i);
+                    }
+                }.execute();
             }
         });
     }

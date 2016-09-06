@@ -26,6 +26,7 @@ import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 
 public class ContactDetailsActivity extends AppCompatActivity {
@@ -77,7 +78,7 @@ public class ContactDetailsActivity extends AppCompatActivity {
         });
 
         if(getIntent().getExtras() != null) {
-            contactSelected = (User) getIntent().getExtras().get("contact");
+            contactSelected = JsonParser.fromJson(User.class, getIntent().getExtras().getString("contact"));
             txtUsername.setText(contactSelected.getName());
             txtEmail.setText(contactSelected.getEmail());
         }

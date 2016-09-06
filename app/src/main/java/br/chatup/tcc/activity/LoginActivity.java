@@ -86,12 +86,13 @@ public class LoginActivity extends AppCompatActivity {
 
             User user = params[0];
             try {
-                String url = Constants.RESTAPI_USER_URL + "/" + user.getUsername();
+                String url = Constants.RESTAPI_USERS_URL + "/" + user.getUsername();
                 ResponseEntity<String> resp = RestFacade.get(url);
                 if(resp.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
                     return null;
                 }
                 else {
+                    Log.i(TAG, "doInBackground: " + resp.getBody());
                     User u = JsonParser.fromJson(User.class, resp.getBody());
                     user.setEmail(u.getEmail());
                     user.setProperties(u.getProperties());

@@ -1,17 +1,15 @@
 package br.chatup.tcc.utils;
 
-import android.util.Log;
-
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,12 +39,22 @@ public class RestFacade {
         return entity;
     }
 
-    private static HttpEntity buildHttpEntity() {
+    private static HttpEntity buildJsonHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", Constants.SERVER_SECRET_KEY);
         headers.add("Accept","application/json");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         return entity;
+    }
+
+    private static HttpEntity buildBasicHttpEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        return entity;
+    }
+
+    public static ResponseEntity<String> post(String url, MultiValueMap<String, String> params) {
+        return restTemplate.postForEntity(url, params, String.class);
     }
 
     public static HttpStatus post(String url, String jsonData) {
@@ -57,20 +65,30 @@ public class RestFacade {
                 String.class).getStatusCode();
     }
 
-    public static ResponseEntity<String> get(String url, Map<String, String> params) {
+    /*public static ResponseEntity<String> get(String url, MultiValueMap<String, String> params) {
         return restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                buildHttpEntity(),
+                buildJsonHttpEntity(),
                 String.class,
                 params);
+    }*/
+
+    public static ResponseEntity<String> get(String url, HttpHeaders httpHeaders) {
+        HttpEntity<String> entity = new HttpEntity<String>(httpHeaders);
+        return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
     }
 
     public static ResponseEntity<String> get(String url) {
         return restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                buildHttpEntity(),
+                buildJsonHttpEntity(),
                 String.class);
     }
 }

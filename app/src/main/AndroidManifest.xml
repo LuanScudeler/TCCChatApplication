@@ -41,11 +41,11 @@
             android:parentActivityName="br.chatup.tcc.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="br.chatup.tcc.activity.MainActivity"/>
+                android:value="br.chatup.tcc.activity.MainActivity" />
         </activity>
         <activity android:name="br.chatup.tcc.activity.RegisterActivity" />
         <activity android:name="br.chatup.tcc.activity.SearchContactActivity" />
-        <activity android:name="br.chatup.tcc.activity.ContactDetailsActivity"></activity>
+        <activity android:name="br.chatup.tcc.activity.ContactDetailsActivity" />
     </application>
 
 </manifest>

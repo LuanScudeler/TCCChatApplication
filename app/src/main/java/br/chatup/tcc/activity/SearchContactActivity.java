@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,18 +18,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.myapplication.R;
@@ -66,7 +61,7 @@ public class SearchContactActivity extends AppCompatActivity {
                 animation1.setDuration(2000);
                 view.startAnimation(animation1);
                 Intent i = new Intent(SearchContactActivity.this, ContactDetailsActivity.class);
-                i.putExtra("contact", usersFound.get(position));
+                i.putExtra("contact", JsonParser.toJson(usersFound.get(position)));
                 startActivity(i);
             }
         });
@@ -92,7 +87,7 @@ public class SearchContactActivity extends AppCompatActivity {
         @Override
         protected List<User> doInBackground(String... params) {
             List<User> users = new ArrayList<User>();
-            ResponseEntity<String> s = RestFacade.get(Constants.RESTAPI_USER_URL + "?search="+params[0]);
+            ResponseEntity<String> s = RestFacade.get(Constants.RESTAPI_USERS_URL + "?search="+params[0]);
             try {
                 com.google.gson.JsonParser jp = new com.google.gson.JsonParser();
                 JsonObject jobj = jp.parse(s.getBody()).getAsJsonObject();

@@ -10,11 +10,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import org.springframework.http.HttpStatus;
+
+import java.util.Locale;
 
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
 
@@ -110,18 +115,13 @@ public class RegisterActivity extends AppCompatActivity {
 			HttpStatus status = null;
 			User newUser = params[0];
 			try {
-				String json =
-						"{" +
-							"\"username\": \"%s\", " +
-								"\"password\": \"%s\", " +
-								"\"name\": \"%s\", " +
-								"\"email\": \"%s\" " +
-						"}";
-				status = RestFacade.post(Constants.RESTAPI_USER_URL, String.format(json,
-						newUser.getUsername(),
-						newUser.getPassword(),
-						newUser.getName(),
-						newUser.getEmail()));
+				LinkedTreeMap<String, User.Property> props = new LinkedTreeMap<>();
+				props.put("property", new User.Property("lang", Locale.getDefault().getLanguage()));
+				newUser.setProperties(props);
+				String json = JsonParser.toJson(newUser);
+				Log.i(TAG, "doInBackground: " + json);
+				status = RestFacade.post(Constants.RESTAPI_USERS_URL, json);
+				//TODO treat http status 409
 				if(status == null || !status.equals(HttpStatus.CREATED)) {
 					newUser = null;
 				}

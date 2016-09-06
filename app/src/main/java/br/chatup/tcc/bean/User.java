@@ -1,8 +1,14 @@
 package br.chatup.tcc.bean;
 
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.LinkedTreeMap;
+
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.springframework.util.MultiValueMap;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import br.chatup.tcc.xmpp.XmppManager;
 
@@ -12,17 +18,18 @@ import br.chatup.tcc.xmpp.XmppManager;
  */
 public class User implements Serializable {
 
+    @SerializedName("username")
     private String username;
-
+    @SerializedName("password")
     private String password;
-
+    @SerializedName("name")
     private String name;
-
+    @SerializedName("email")
     private String email;
+    @SerializedName("properties")
+    private LinkedTreeMap<String, Property> properties;
 
-    private String properties; 
-
-    public User(String username, String password, String name, String email, String properties) {
+    public User(String username, String password, String name, String email, LinkedTreeMap<String, Property> properties) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -62,11 +69,11 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getProperties() {
+    public LinkedTreeMap<String, Property> getProperties() {
         return properties;
     }
 
-    public void setProperties(String properties) {
+    public void setProperties(LinkedTreeMap<String, Property> properties) {
         this.properties = properties;
     }
 
@@ -106,7 +113,28 @@ public class User implements Serializable {
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", properties='" + properties + '\'' +
+                ", properties=" + properties +
                 '}';
     }
+
+    public static class Property implements Serializable {
+        @SerializedName("@key")
+        private String key;
+        @SerializedName("@value")
+        private String value;
+
+        public Property(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
 }

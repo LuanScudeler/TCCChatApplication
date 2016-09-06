@@ -30,6 +30,7 @@ import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.myapplication.R;
+import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 import br.chatup.tcc.xmpp.XmppManager;
 
@@ -85,9 +86,9 @@ public class XmppService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            User user = (User)intent.getSerializableExtra("user");
+            User user = JsonParser.fromJson(User.class, intent.getExtras().getString("user"));
             Log.i(TAG, "User :" + user);
-            xmppManager = new XmppManager((User)intent.getSerializableExtra("user"));
+            xmppManager = new XmppManager(user);
             if(!connected){
                 xmppManager.init();
                 xmppManager.connect();

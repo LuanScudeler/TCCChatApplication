@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -25,6 +26,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
@@ -33,14 +38,21 @@ import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.stringprep.XmppStringPrepUtil;
 import org.jxmpp.util.XmppDateTime;
 import org.jxmpp.util.XmppStringUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
+import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 
 import br.chatup.tcc.chat.MessageListener;
@@ -50,6 +62,7 @@ import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.App;
 import br.chatup.tcc.utils.Constants;
+import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
 
 //TODO: Retrieve chat history when loading chatActivity
@@ -66,6 +79,9 @@ public class ChatActivity extends AppCompatActivity {
     private ChatMessage chatMessage;
     private AppDataSource db;
     private String currActiveChat;
+
+    private String token;
+    private String langTo;
 
     private static boolean serviceConnected;
     private static XmppService xmppService;
@@ -200,6 +216,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
 		contactJID = getIntent().getExtras().getString("contactJID").toString();
+        langTo = getIntent().getExtras().getString("langTo");
         //username for controlling notification behavior
         currActiveChat = XmppStringUtils.parseLocalpart(contactJID);
 
@@ -237,14 +254,59 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void btnSendMessageClick(View v) {
+        if(edtMessageBody.getText().toString().isEmpty()) return;
+        new AsyncTask<String, Void, String>() {
+            @Override
+            protected void onPreExecute() {
+                edtMessageBody.setEnabled(false);
+            }
 
-        messageBody = edtMessageBody.getText().toString();
-        String time = new SimpleDateFormat("HH:mm").format(new Date());
-        chatMessage = new ChatMessage(messageBody, contactJID, true, time);
+            @Override
+            protected String doInBackground(String... params) {
+                String w = params[0];
+                if(!langTo.equals(xmppService.getXmppManager().getUser().getProperties().get("property").getValue())) {
+                    w.replaceAll(" ", "%20");
 
-        sendMessage();
-        displayMessage(chatMessage);
-		edtMessageBody.setText("");
+                    ResponseEntity<String> re = RestFacade.post(Constants.TOKEN_SERVICE_URL, Constants.TOKEN_SERVICE_URI_PARAMS);
+                    String r = re.getBody();
+                    JsonElement jelement = new JsonParser().parse(r);
+                    JsonObject jobject = jelement.getAsJsonObject();
+                    token =  jobject.get("access_token").toString();
+
+                    HttpHeaders headers = new HttpHeaders();
+
+                    String langFrom = xmppService.getXmppManager().getUser().getProperties().get("property").getValue();
+                    String url = String.format(Constants.TRANSLATION_URL, w, langFrom, langTo);
+                    headers.add("Authorization", "Bearer " + token.replaceAll("\"", ""));
+                    Log.i(TAG, "doInBackground: " + url);
+                    ResponseEntity<String> resp = RestFacade.get(
+                            url,
+                            headers
+                    );
+                    return resp.getBody();
+                }
+                else {
+                    return params[0];
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                Log.i(TAG, "onPostExecute: " + s);
+                if(s.contains(">")) {
+                    messageBody = s.split(">")[1].split("<")[0];
+                }
+                else {
+                    messageBody = s;
+                }
+                edtMessageBody.setEnabled(true);
+                String time = new SimpleDateFormat("HH:mm").format(new Date());
+                chatMessage = new ChatMessage(messageBody, contactJID, true, time);
+                displayMessage(chatMessage);
+                sendMessage();
+                edtMessageBody.setText("");
+            }
+        }.execute(edtMessageBody.getText().toString());
 	}
 
 	public void sendMessage() {
@@ -270,16 +332,16 @@ public class ChatActivity extends AppCompatActivity {
 				Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactJID).toString());
 			}
 
-			message.setBody(messageBody);
-			message.setType(Message.Type.chat);
+            message.setBody(messageBody);
+            message.setType(Message.Type.chat);
 
             Boolean success = true;
-			try {
-				newChat.sendMessage(message);
-			} catch(SmackException.NotConnectedException e) {
+            try {
+                newChat.sendMessage(message);
+            } catch(SmackException.NotConnectedException e) {
                 success = false;
-				e.printStackTrace();
-			} catch (Exception e){
+                e.printStackTrace();
+            } catch (Exception e){
                 success = false;
                 e.printStackTrace();
             }
