@@ -1,8 +1,5 @@
 package br.chatup.tcc.xmpp;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,15 +9,12 @@ import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
-import br.chatup.tcc.activity.MainActivity;
 import br.chatup.tcc.bean.User;
-import br.chatup.tcc.chat.ChatListener;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.Util;
 

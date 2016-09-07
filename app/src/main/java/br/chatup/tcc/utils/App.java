@@ -14,10 +14,12 @@ public class App extends Application {
 
     public static Activity mCurrentActivity = null;
     public static String mCurrentActiveChat = null;
+    public static boolean translationEnabled;
 
     public static Activity getCurrentActivity(){
         return mCurrentActivity;
     }
+
     public static void setCurrentActivity(Activity currentActivity){
         mCurrentActivity = currentActivity;
     }
@@ -30,5 +32,11 @@ public class App extends Application {
         mCurrentActiveChat = currentActiveChat;
     }
 
+    public static boolean isTranslationEnabled() {
+        return translationEnabled;
+    }
 
+    public static void setTranslationEnabled(boolean translationEnabled) {
+        App.translationEnabled = translationEnabled;
+    }
 }

@@ -42,7 +42,7 @@ public class MessageListener implements ChatMessageListener, ChatStateListener  
 
     @Override
     public void processMessage(Chat chat, Message message) {
-        Log.d(TAG, "[MESSAGE RECEIVED] Body: " + message.getBody() + " | User: " + chat.getParticipant() + " | ThreadID: " + chat.getThreadID());
+        Log.d(TAG, "[RECEIVING MESSAGE] Body: " + message.getBody() + " | User: " + chat.getParticipant() + " | ThreadID: " + chat.getThreadID());
 
         //"contact" in database must be only de username portion of the JID
         String storableUsername = XmppStringUtils.parseLocalpart(chat.getParticipant());

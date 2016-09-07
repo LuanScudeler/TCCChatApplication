@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,6 +36,7 @@ import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
+import br.chatup.tcc.utils.App;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 
@@ -202,6 +204,26 @@ public class MainActivity extends AppCompatActivity
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.chats, menu);
+
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.toggle_translation) {
+            if(App.isTranslationEnabled())
+                App.setTranslationEnabled(false);
+            else
+                App.setTranslationEnabled(true);
+            String currTranslationMode = App.isTranslationEnabled()?"ON":"OFF";
+            Toast.makeText(getApplicationContext(), "Translation mode: " + currTranslationMode, Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 }

@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -22,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.google.gson.JsonElement;
@@ -59,14 +61,15 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
     private EditText edtMessageBody;
-    private Chat newChat;
     private ListView messagesContainer;
+    private ImageButton btnSendMessage;
+    private Chat newChat;
+    private ChatMessage chatMessage;
     private ChatContainerAdapter chatContainerAdapter;
-    private ProgressDialog pDialog;
-    private String contactJID;
     private AppDataSource db;
-    private String currActiveChat;
 
+    private String currActiveChat;
+    private String contactJID;
     private String token;
     private String langTo;
 
@@ -198,24 +201,25 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        db = new AppDataSource(this);
         edtMessageBody = (EditText) findViewById(R.id.edtMessage);
         messagesContainer = (ListView) findViewById(R.id.msgListView);
+        btnSendMessage = (ImageButton) findViewById(R.id.btnSendMessage);
 
+        db = new AppDataSource(this);
+
+        //Get contactJID from selected user
         contactJID = getIntent().getExtras().getString("contactJID").toString();
         //username for controlling notification behavior
         currActiveChat = XmppStringUtils.parseLocalpart(contactJID);
 
         String displayableUsername = Util.toCapital(XmppStringUtils.parseLocalpart(contactJID));
         ChatActivity.this.setTitle(displayableUsername);
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected void onPreExecute() {
-                pDialog = new ProgressDialog(ChatActivity.this);
-                pDialog.setMessage(Util.getStringResource(ChatActivity.this, R.string.please_wait));
-                pDialog.show();
-            }
 
+        initChatView();
+        initChatData();
+
+        //Start Async task for retrieving receptor contact language
+        new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 ResponseEntity<String> resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJID.split("@")[0]));
@@ -226,10 +230,7 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(String s) {
-                pDialog.cancel();
                 langTo = s;
-                initChatView();
-                initChatData();
             }
         }.execute();
     }
@@ -262,13 +263,30 @@ public class ChatActivity extends AppCompatActivity {
 
     public void btnSendMessageClick(View v) {
         if (edtMessageBody.getText().toString().isEmpty()) return;
+
+        String messageBody = edtMessageBody.getText().toString();
+        String time = new SimpleDateFormat("HH:mm").format(new Date());
+        chatMessage = new ChatMessage(messageBody, contactJID, true, time, messageBody);
+
+        if(App.isTranslationEnabled()){
+            displayMessage(chatMessage);
+            translateAndSend();
+        }else{
+            sendMessage(messageBody,messageBody);
+            displayMessage(chatMessage);
+            edtMessageBody.setText("");
+        }
+    }
+
+    public void translateAndSend() {
         if (!langTo.equals(xmppService.getXmppManager().getUser().getProperties().get("property").getValue())) {
             new AsyncTask<String, Void, String[]>() {
                 String message, messageTranslated;
 
                 @Override
                 protected void onPreExecute() {
-                    edtMessageBody.setEnabled(false);
+                    edtMessageBody.setText("");
+                    btnSendMessage.setEnabled(false);
                 }
 
                 @Override
@@ -299,8 +317,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 @Override
                 protected void onPostExecute(String[] s) {
-                    edtMessageBody.setEnabled(true);
-                    edtMessageBody.setText("");
+                    btnSendMessage.setEnabled(true);
                     sendMessage(s[0], s[1]);
                 }
             }.execute(edtMessageBody.getText().toString());
@@ -310,45 +327,32 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void sendMessage(String messageBody, String messageBodyTranslated) {
-        String time = new SimpleDateFormat("HH:mm").format(new Date());
-        ChatMessage chatMessage = new ChatMessage(messageBody, contactJID, true, time, messageBodyTranslated);
-        final Message message = new Message();
-        ChatManager chatManager = ChatManager.getInstanceFor(xmppService.getXmppManager().getConn());
         //Gets for whom the message will go for (retrieves a user JID: username@domain)
         String messageReceiver = chatMessage.getReceiver();
-        if (!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
-            newChat = chatManager.createChat(messageReceiver);
-            CacheStorage.addChatContact(messageReceiver, newChat.getThreadID());
-            //Log.d(TAG, "[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: " + messageReceiver + " | ThreadID: " + newChat.getThreadID());
-        } else {
-            //Get chat threadID from cachedChats for the current contact that the user is chatting with
-            newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactJID));
-            //Set on message the chat threadID that already exist in the cachedChats
-            message.setThread(CacheStorage.getInstanceCachedChats().get(contactJID).toString());
-            //Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactJID).toString());
-        }
-        message.setBody(messageBodyTranslated);
-        message.setType(Message.Type.chat);
+
+        //Update messageBodyTranslated in case sendMassage() received a translated message
+        chatMessage.setBodyTranslated(messageBodyTranslated);
+
+        newChat = xmppService.getChatManager().createChat(messageReceiver);
+
         Boolean success = true;
         try {
-            newChat.sendMessage(message);
-        } catch (SmackException.NotConnectedException e) {
+            Log.d(TAG, "[SENDING MESSAGE] Body: " + messageBodyTranslated + " | User: " + messageReceiver + " | ThreadID: " + newChat.getThreadID());
+            newChat.sendMessage(messageBodyTranslated);
+        } catch(SmackException.NotConnectedException e) {
             success = false;
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (Exception e){
             success = false;
             e.printStackTrace();
         }
         //Save messages history
-        if (success) {
+        if(success) {
             //"contact" in database must be only de username portion of the JID
             chatMessage.setReceiver(XmppStringUtils.parseLocalpart(chatMessage.getReceiver()));
             db.insert(chatMessage);
-            displayMessage(chatMessage);
         }
     }
-
-    //TODO: Allow user to answer the first message (GUI stuffs, list activity and user notification for incoming messages)
 }
 
 

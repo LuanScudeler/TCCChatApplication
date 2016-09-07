@@ -97,13 +97,4 @@ public class CacheStorage {
         //TODO
         return null;
     }
-
-    public static void addChatContact(String contactJID, String threadID){
-        openChats.put(contactJID, threadID);
-    }
-
-    public static HashMap<String, String> getInstanceCachedChats(){
-        return openChats;
-    }
-
 }

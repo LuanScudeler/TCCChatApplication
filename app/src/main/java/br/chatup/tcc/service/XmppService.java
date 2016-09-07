@@ -14,21 +14,21 @@ import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jxmpp.util.XmppStringUtils;
 
 import java.io.IOException;
 
 import br.chatup.tcc.activity.ChatActivity;
-import br.chatup.tcc.activity.MainActivity;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
-import br.chatup.tcc.chat.ChatListener;
+import br.chatup.tcc.chat.MessageListener;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
@@ -42,6 +42,7 @@ public class XmppService extends Service {
     private XmppManager xmppManager;
     private ProgressDialog pDialog;
     private AbstractXMPPConnection connection;
+    private ChatManager chatManager;
     private static final String TAG = Util.getTagForClass(XmppService.class);
     private boolean connected;
 
@@ -62,25 +63,38 @@ public class XmppService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i(TAG, "Creating service");
+
         IntentFilter it = new IntentFilter();
         it.addAction("BROADCAST_ON_SERVICE");
         it.addCategory(Intent.CATEGORY_DEFAULT);
+
         registerReceiver(mMessageReceiver, it);
-        //Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind");
-        //Toast.makeText(this, "Service Binded | Initializing listener", Toast.LENGTH_LONG).show();
+
         connection = XmppManager.getConn();
         initializeChatListener();
+
         return new LocalBinder<XmppService>(this);
     }
 
     private void initializeChatListener() {
-        Log.i(TAG, "Initializing listener");
-        ChatManager.getInstanceFor(connection).addChatListener(new ChatListener(getApplicationContext()));
+        Log.i(TAG, "Initializing listeners");
+        if(connection!=null){
+            chatManager = ChatManager.getInstanceFor(connection);
+            chatManager.addChatListener(new ChatManagerListener() {
+                @Override
+                public void chatCreated(Chat chat, boolean createdLocally) {
+                    if (!createdLocally) {
+                        chat.addMessageListener(new MessageListener(getApplicationContext()));
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -104,7 +118,6 @@ public class XmppService extends Service {
         }else {
             Log.i(TAG, "Service already connected");
         }
-        //TODO: Fix cachedChats not working when application process is killed and then restored
         //Prevents application from crashing when process is killed. Service doesn't restart automatically
         return START_NOT_STICKY;
     }
@@ -118,18 +131,14 @@ public class XmppService extends Service {
         super.onDestroy();
     }
 
+    public ChatManager getChatManager(){
+        return chatManager;
+    }
+
     public void init(User user) throws XMPPException, IOException, SmackException {
         Log.i(TAG, "init: " + user);
         xmppManager = new XmppManager(user);
         xmppManager.init();
-    }
-
-    public void connect() {
-        xmppManager.connect();
-    }
-
-    public void disconnect() {
-        xmppManager.disconnect();
     }
 
     public XmppManager getXmppManager(){return xmppManager;}
