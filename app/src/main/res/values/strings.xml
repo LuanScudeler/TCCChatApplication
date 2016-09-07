@@ -14,6 +14,8 @@
     <string name="confirm">Confirm</string>
     <string name="search">Search</string>
     <string name="add_to_contacts">Add to contacts</string>
+    <string name="translated_message">Translated message</string>
+    <string name="close">Close</string>
 
 
     <!-- LoginActivity -->

@@ -1,7 +1,9 @@
 package br.chatup.tcc.adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import br.chatup.tcc.bean.ChatMessage;
-import br.chatup.tcc.chat.MessageListener;
 import br.chatup.tcc.myapplication.R;
+import br.chatup.tcc.utils.Util;
 
 /**
  * Created by Luan on 8/6/2016.
@@ -57,7 +58,7 @@ public class ChatContainerAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        ChatMessage chatMessage = getItem(position);
+        final ChatMessage chatMessage = getItem(position);
         LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
@@ -68,11 +69,27 @@ public class ChatContainerAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        boolean myMsg = chatMessage.isMe() ;
+        boolean myMsg = chatMessage.isMe();
         setAlignment(holder, myMsg);
         holder.txtMessage.setText(chatMessage.getBody());
         holder.txtInfo.setText(chatMessage.getDate());
 
+        final View temp = convertView;
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(temp.getContext())
+                        .setTitle(Util.getStringResource(temp, R.string.translated_message))
+                        .setMessage(chatMessage.getBodyTranslated())
+                        .setPositiveButton(Util.getStringResource(temp, R.string.close), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .show();
+            }
+        });
         return convertView;
     }
 

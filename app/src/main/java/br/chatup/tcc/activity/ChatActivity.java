@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -14,17 +15,14 @@ import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,29 +31,20 @@ import com.google.gson.JsonParser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
-import org.jxmpp.stringprep.XmppStringPrepUtil;
-import org.jxmpp.util.XmppDateTime;
 import org.jxmpp.util.XmppStringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
-
-import br.chatup.tcc.chat.MessageListener;
 import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
@@ -68,15 +57,13 @@ import br.chatup.tcc.utils.Util;
 //TODO: Retrieve chat history when loading chatActivity
 public class ChatActivity extends AppCompatActivity {
 
-	private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
-	private EditText edtMessageBody;
-	private Chat newChat;
+    private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
+    private EditText edtMessageBody;
+    private Chat newChat;
     private ListView messagesContainer;
     private ChatContainerAdapter chatContainerAdapter;
-
+    private ProgressDialog pDialog;
     private String contactJID;
-    private String messageBody;
-    private ChatMessage chatMessage;
     private AppDataSource db;
     private String currActiveChat;
 
@@ -100,20 +87,20 @@ public class ChatActivity extends AppCompatActivity {
     };
 
     /**
-     *  FullJID composed by localPart@Domain/Resource
-     *
-     *  localPart: username
-     *  Domain: Server address
-     *  Resource: "/Smack"
+     * FullJID composed by localPart@Domain/Resource
+     * <p/>
+     * localPart: username
+     * Domain: Server address
+     * Resource: "/Smack"
      */
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
-            Log.d(TAG, "[BroadcastReceiver] Message received | From: "+ message.getReceiver() + " | Body: "+ message.getBody());
+            ChatMessage message = (ChatMessage) intent.getSerializableExtra("message");
+            Log.d(TAG, "[BroadcastReceiver] Message received | From: " + message.getReceiver() + " | Body: " + message.getBody());
 
             String senderUsername = XmppStringUtils.parseLocalpart(message.getReceiver());
-            if(senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID)))
+            if (senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID)))
                 displayMessage(message);
             else {
                 Log.d(TAG, "[BroadcastReceiver] Raising notification");
@@ -198,33 +185,53 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private void clearReferences(){
+    private void clearReferences() {
         Activity currActivity = App.getCurrentActivity();
-        if (this.equals(currActivity) && currActiveChat.equals(App.getCurrentActiveChat())){
+        if (this.equals(currActivity) && currActiveChat.equals(App.getCurrentActiveChat())) {
             App.setCurrentActivity(null);
             App.setCurrentActiveChat(null);
         }
     }
 
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_chat);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
 
         db = new AppDataSource(this);
-		edtMessageBody = (EditText) findViewById(R.id.edtMessage);
+        edtMessageBody = (EditText) findViewById(R.id.edtMessage);
         messagesContainer = (ListView) findViewById(R.id.msgListView);
 
-		contactJID = getIntent().getExtras().getString("contactJID").toString();
-        langTo = getIntent().getExtras().getString("langTo");
+        contactJID = getIntent().getExtras().getString("contactJID").toString();
         //username for controlling notification behavior
         currActiveChat = XmppStringUtils.parseLocalpart(contactJID);
 
         String displayableUsername = Util.toCapital(XmppStringUtils.parseLocalpart(contactJID));
         ChatActivity.this.setTitle(displayableUsername);
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected void onPreExecute() {
+                pDialog = new ProgressDialog(ChatActivity.this);
+                pDialog.setMessage(Util.getStringResource(ChatActivity.this, R.string.please_wait));
+                pDialog.show();
+            }
 
-        initChatView();
-        initChatData();
+            @Override
+            protected String doInBackground(Void... params) {
+                ResponseEntity<String> resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJID.split("@")[0]));
+                User u = br.chatup.tcc.utils.JsonParser.fromJson(User.class, resp.getBody());
+                Log.i(TAG, "doInBackground: " + u);
+                return u.getProperties().get("property").getValue();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                pDialog.cancel();
+                langTo = s;
+                initChatView();
+                initChatData();
+            }
+        }.execute();
     }
 
     private void initChatView() {
@@ -236,7 +243,7 @@ public class ChatActivity extends AppCompatActivity {
         //Retrieves chat history
         List<ChatMessage> chatMessageList;
         chatMessageList = db.findAllByContact(XmppStringUtils.parseLocalpart(contactJID));
-        for(ChatMessage chatMessage : chatMessageList) {
+        for (ChatMessage chatMessage : chatMessageList) {
             chatContainerAdapter.add(chatMessage);
         }
         ((ChatContainerAdapter) messagesContainer.getAdapter()).notifyDataSetChanged();
@@ -254,108 +261,94 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void btnSendMessageClick(View v) {
-        if(edtMessageBody.getText().toString().isEmpty()) return;
-        new AsyncTask<String, Void, String>() {
-            @Override
-            protected void onPreExecute() {
-                edtMessageBody.setEnabled(false);
-            }
+        if (edtMessageBody.getText().toString().isEmpty()) return;
+        if (!langTo.equals(xmppService.getXmppManager().getUser().getProperties().get("property").getValue())) {
+            new AsyncTask<String, Void, String[]>() {
+                String message, messageTranslated;
 
-            @Override
-            protected String doInBackground(String... params) {
-                String w = params[0];
-                //TODO: Fix NullPointer on below line when sending a message after accessing ChatActivity through a notification
-                if(!langTo.equals(xmppService.getXmppManager().getUser().getProperties().get("property").getValue())) {
-                    w.replaceAll(" ", "%20");
+                @Override
+                protected void onPreExecute() {
+                    edtMessageBody.setEnabled(false);
+                }
+
+                @Override
+                protected String[] doInBackground(String[] params) {
+                    message = params[0];
+                    message.replaceAll(" ", "%20");
 
                     ResponseEntity<String> re = RestFacade.post(Constants.TOKEN_SERVICE_URL, Constants.TOKEN_SERVICE_URI_PARAMS);
                     String r = re.getBody();
                     JsonElement jelement = new JsonParser().parse(r);
                     JsonObject jobject = jelement.getAsJsonObject();
-                    token =  jobject.get("access_token").toString();
+                    token = jobject.get("access_token").toString();
 
+                    //sending the message to the translation service
                     HttpHeaders headers = new HttpHeaders();
-
                     String langFrom = xmppService.getXmppManager().getUser().getProperties().get("property").getValue();
-                    String url = String.format(Constants.TRANSLATION_URL, w, langFrom, langTo);
+                    String turl = String.format(Constants.TRANSLATION_URL, message, langFrom, langTo);
                     headers.add("Authorization", "Bearer " + token.replaceAll("\"", ""));
-                    Log.i(TAG, "doInBackground: " + url);
                     ResponseEntity<String> resp = RestFacade.get(
-                            url,
+                            turl,
                             headers
                     );
-                    return resp.getBody();
+                    String s = resp.getBody();
+                    //response format from translation service: <string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">The message</string>
+                    messageTranslated = s.split(">")[1].split("<")[0];
+                    return new String[]{message, messageTranslated};
                 }
-                else {
-                    return params[0];
+
+                @Override
+                protected void onPostExecute(String[] s) {
+                    edtMessageBody.setEnabled(true);
+                    edtMessageBody.setText("");
+                    sendMessage(s[0], s[1]);
                 }
-            }
+            }.execute(edtMessageBody.getText().toString());
+        } else {
+            sendMessage(edtMessageBody.getText().toString(), edtMessageBody.getText().toString());
+        }
+    }
 
-            @Override
-            protected void onPostExecute(String s) {
-                Log.i(TAG, "onPostExecute: " + s);
-                if(s.contains(">")) {
-                    messageBody = s.split(">")[1].split("<")[0];
-                }
-                else {
-                    messageBody = s;
-                }
-                edtMessageBody.setEnabled(true);
-                String time = new SimpleDateFormat("HH:mm").format(new Date());
-                chatMessage = new ChatMessage(messageBody, contactJID, true, time);
-                displayMessage(chatMessage);
-                sendMessage();
-                edtMessageBody.setText("");
-            }
-        }.execute(edtMessageBody.getText().toString());
-	}
+    public void sendMessage(String messageBody, String messageBodyTranslated) {
+        String time = new SimpleDateFormat("HH:mm").format(new Date());
+        ChatMessage chatMessage = new ChatMessage(messageBody, contactJID, true, time, messageBodyTranslated);
+        final Message message = new Message();
+        ChatManager chatManager = ChatManager.getInstanceFor(xmppService.getXmppManager().getConn());
+        //Gets for whom the message will go for (retrieves a user JID: username@domain)
+        String messageReceiver = chatMessage.getReceiver();
+        if (!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
+            newChat = chatManager.createChat(messageReceiver);
+            CacheStorage.addChatContact(messageReceiver, newChat.getThreadID());
+            //Log.d(TAG, "[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: " + messageReceiver + " | ThreadID: " + newChat.getThreadID());
+        } else {
+            //Get chat threadID from cachedChats for the current contact that the user is chatting with
+            newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactJID));
+            //Set on message the chat threadID that already exist in the cachedChats
+            message.setThread(CacheStorage.getInstanceCachedChats().get(contactJID).toString());
+            //Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactJID).toString());
+        }
+        message.setBody(messageBodyTranslated);
+        message.setType(Message.Type.chat);
+        Boolean success = true;
+        try {
+            newChat.sendMessage(message);
+        } catch (SmackException.NotConnectedException e) {
+            success = false;
+            e.printStackTrace();
+        } catch (Exception e) {
+            success = false;
+            e.printStackTrace();
+        }
+        //Save messages history
+        if (success) {
+            //"contact" in database must be only de username portion of the JID
+            chatMessage.setReceiver(XmppStringUtils.parseLocalpart(chatMessage.getReceiver()));
+            db.insert(chatMessage);
+            displayMessage(chatMessage);
+        }
+    }
 
-	public void sendMessage() {
-		if(!messageBody.equalsIgnoreCase("")) {
-			final Message message = new Message();
-			ChatManager chatManager = ChatManager.getInstanceFor(xmppService.getXmppManager().getConn());
-			//Gets for whom the message will go for (retrieves a user JID: username@domain)
-			String messageReceiver = chatMessage.getReceiver();
-
-            Log.d(TAG, "[SENDING] Sending message to: " + messageReceiver);
-
-			if(!CacheStorage.getInstanceCachedChats().containsKey(messageReceiver)) {
-				newChat = chatManager.createChat(messageReceiver);
-
-                CacheStorage.addChatContact(messageReceiver,newChat.getThreadID());
-                Log.d(TAG,"[CHAT CREATED] Receiver not found in contacts cache. ADDING TO CACHE -> Contact: "+messageReceiver+" | ThreadID: "+newChat.getThreadID());
-            }else {
-				//Get chat threadID from cachedChats for the current contact that the user is chatting with
-				newChat = chatManager.getThreadChat(CacheStorage.getInstanceCachedChats().get(contactJID));
-				//Set on message the chat threadID that already exist in the cachedChats
-				message.setThread(CacheStorage.getInstanceCachedChats().get(contactJID).toString());
-
-				Log.d(TAG, "[CHAT ALREADY OPENED] Setting threadID for reply. CACHED_THREAD-ID: " + CacheStorage.getInstanceCachedChats().get(contactJID).toString());
-			}
-
-            message.setBody(messageBody);
-            message.setType(Message.Type.chat);
-
-            Boolean success = true;
-            try {
-                newChat.sendMessage(message);
-            } catch(SmackException.NotConnectedException e) {
-                success = false;
-                e.printStackTrace();
-            } catch (Exception e){
-                success = false;
-                e.printStackTrace();
-            }
-            //Save messages history
-            if(success) {
-                //"contact" in database must be only de username portion of the JID
-                chatMessage.setReceiver(XmppStringUtils.parseLocalpart(chatMessage.getReceiver()));
-                db.insert(chatMessage);
-            }
-		}
-	}
-
-	//TODO: Allow user to answer the first message (GUI stuffs, list activity and user notification for incoming messages)
+    //TODO: Allow user to answer the first message (GUI stuffs, list activity and user notification for incoming messages)
 }
 
 

@@ -9,13 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DataBaseHelper extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "chatsArchive.db";
-    private static final int DB_VERSION = 1;
-    private static final String TABLE_NAME = "chatMessages";
-    private static final String COLUMN_1 = "contact";
-    private static final String COLUMN_2 = "msgBody";
-    private static final String COLUMN_3 = "isMe";
-    private static final String COLUMN_4 = "date";
+    public static final String DB_NAME = "chatsArchive.db";
+    public static final int DB_VERSION = 2;
+    public static final String TABLE_CHAT_MESSAGES = "chatMessages";
+    public static final String COLUMN_CONTACT = "contact";
+    public static final String COLUMN_MSG_BODY = "msgBody";
+    public static final String COLUMN_IS_ME = "isMe";
+    public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_MSG_BODY_TRANSLATED = "msgBodyTranslated";
 
     public DataBaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -23,16 +24,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_ID INTEGER PRIMARY KEY, " +
-                COLUMN_1 + " TEXT NOT NULL, " +
-                COLUMN_2 + " TEXT NOT NULL, " +
-                COLUMN_3 + " INTEGER NOT NULL, " +
-                COLUMN_4 + " TEXT NOT NULL );");
+        db.execSQL("CREATE TABLE " + TABLE_CHAT_MESSAGES + "(_ID INTEGER PRIMARY KEY, " +
+                COLUMN_CONTACT + " TEXT NOT NULL, " +
+                COLUMN_MSG_BODY + " TEXT NOT NULL, " +
+                COLUMN_IS_ME + " INTEGER NOT NULL, " +
+                COLUMN_DATE + " TEXT NOT NULL, " +
+                COLUMN_MSG_BODY_TRANSLATED + " TEXT NOT NULL);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE "+TABLE_NAME+";");
+        db.execSQL("DROP TABLE " + TABLE_CHAT_MESSAGES + ";");
         onCreate(db);
     }
 }

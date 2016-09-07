@@ -3,14 +3,7 @@ package br.chatup.tcc.bean;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.internal.LinkedTreeMap;
 
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.springframework.util.MultiValueMap;
-
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
-import br.chatup.tcc.xmpp.XmppManager;
 
 /**
  * Created by jnde on 08/03/2016.

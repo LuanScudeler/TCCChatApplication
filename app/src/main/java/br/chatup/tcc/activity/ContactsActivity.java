@@ -122,53 +122,14 @@ public class ContactsActivity extends AppCompatActivity {
 
     private AdapterView.OnItemClickListener openChatActivity() {
         return(new AdapterView.OnItemClickListener() {
-            String contactJIDSelected;
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // selected item
-                contactJIDSelected = entriesList.get(position).getUser();
-                Log.i(TAG, "onItemClick: " + contactJIDSelected);
-                new AsyncTask<Void, Void, String>() {
-                    @Override
-                    protected void onPreExecute() {
-                        pDialog = new ProgressDialog(ContactsActivity.this);
-                        pDialog.setMessage(Util.getStringResource(ContactsActivity.this, R.string.please_wait));
-                        pDialog.show();
-                    }
-
-                    @Override
-                    protected String doInBackground(Void... params) {
-                        ResponseEntity<String> resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJIDSelected.split("@")[0]));
-                        User u = JsonParser.fromJson(User.class, resp.getBody());
-                        Log.i(TAG, "doInBackground: " + u);
-                        return u.getProperties().get("property").getValue();
-                    }
-
-                    @Override
-                    protected void onPostExecute(String s) {
-                        Intent i = new Intent(ContactsActivity.this, ChatActivity.class);
-                        i.putExtra("contactJID", contactJIDSelected);
-                        i.putExtra("langTo", s);
-                        startActivity(i);
-                    }
-                }.execute();
+                String contactJIDSelected = entriesList.get(position).getUser();
+                Intent i = new Intent(ContactsActivity.this, ChatActivity.class);
+                i.putExtra("contactJID", contactJIDSelected);
+                startActivity(i);
             }
         });
-    }
-
-
-    private void addUserForTest(Roster roster, String userJID, String nickName) {
-        try {
-            roster.createEntry(userJID, nickName ,null);
-        } catch (SmackException.NotLoggedInException e) {
-            e.printStackTrace();
-        } catch (SmackException.NoResponseException e) {
-            e.printStackTrace();
-        } catch (XMPPException.XMPPErrorException e) {
-            e.printStackTrace();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
     }
 
     public void startRosterPresenceListener(Roster roster){

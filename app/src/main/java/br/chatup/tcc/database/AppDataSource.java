@@ -11,10 +11,17 @@ import java.util.ArrayList;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.utils.Constants;
 
+import static br.chatup.tcc.database.DataBaseHelper.COLUMN_CONTACT;
+import static br.chatup.tcc.database.DataBaseHelper.COLUMN_DATE;
+import static br.chatup.tcc.database.DataBaseHelper.COLUMN_IS_ME;
+import static br.chatup.tcc.database.DataBaseHelper.COLUMN_MSG_BODY;
+import static br.chatup.tcc.database.DataBaseHelper.COLUMN_MSG_BODY_TRANSLATED;
+import static br.chatup.tcc.database.DataBaseHelper.TABLE_CHAT_MESSAGES;
+
 /**
  * Created by Luan on 9/3/2016.
  */
-public class AppDataSource implements ChatMessagesDao{
+public class AppDataSource implements ChatMessagesDao {
     private static final String TAG = Constants.LOG_TAG + AppDataSource.class.getSimpleName();
     private SQLiteDatabase db;
 
@@ -24,21 +31,22 @@ public class AppDataSource implements ChatMessagesDao{
     }
 
     @Override
-    public void insert(ChatMessage chatMessage){
+    public void insert(ChatMessage chatMessage) {
         ContentValues v = new ContentValues();
-        v.put("contact", chatMessage.getReceiver());
-        v.put("msgBody", chatMessage.getBody());
-        v.put("isMe", chatMessage.isMe() == true ? 1 : 0);
-        v.put("date", chatMessage.getDate());
+        v.put(COLUMN_CONTACT, chatMessage.getReceiver());
+        v.put(COLUMN_MSG_BODY, chatMessage.getBody());
+        v.put(COLUMN_IS_ME, chatMessage.isMe() == true ? 1 : 0);
+        v.put(COLUMN_DATE, chatMessage.getDate());
+        v.put(COLUMN_MSG_BODY_TRANSLATED, chatMessage.getBodyTranslated());
 
-        db.insert("chatMessages", null, v);
+        db.insert(TABLE_CHAT_MESSAGES, null, v);
     }
 
     @Override
-    public ArrayList<ChatMessage> findAllByContact(String contact){
+    public ArrayList<ChatMessage> findAllByContact(String contact) {
         ArrayList<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
         Cursor cursor = db.
-                rawQuery("SELECT * FROM chatMessages WHERE contact = ?", new String[]{contact} );
+                rawQuery("SELECT * FROM chatMessages WHERE contact = ?", new String[]{contact});
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -46,7 +54,8 @@ public class AppDataSource implements ChatMessagesDao{
             Log.d(TAG, "[findAllByContact] contact: " + chatMessage.getReceiver() +
                     " | msgBody: " + chatMessage.getBody() +
                     " | isMe: " + chatMessage.isMe() +
-                    " | date: " + chatMessage.getDate());
+                    " | date: " + chatMessage.getDate() +
+                    " | messageBodyTranslated: " + chatMessage.getBodyTranslated());
             chatMessageList.add(chatMessage);
             cursor.moveToNext();
         }
@@ -59,8 +68,9 @@ public class AppDataSource implements ChatMessagesDao{
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setReceiver(cursor.getString(1));
         chatMessage.setBody(cursor.getString(2));
-        chatMessage.setIsMe(cursor.getInt(3) == 1 ? true : false);
+        chatMessage.setMe(cursor.getInt(3) == 1 ? true : false);
         chatMessage.setDate(cursor.getString(4));
+        chatMessage.setBodyTranslated(cursor.getString(5));
         return chatMessage;
     }
 }

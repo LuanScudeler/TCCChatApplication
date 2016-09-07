@@ -55,7 +55,8 @@ public class MessageListener implements ChatMessageListener, ChatStateListener  
             chatMessage = new ChatMessage(message.getBody(),
                     chat.getParticipant(),
                     false,
-                    time);
+                    time,
+                    message.getBody());
 
             Log.d(TAG, "NOTIFYING MESSAGE RECEIVED");
             Intent intent = new Intent("receivedMessage");
@@ -79,7 +80,8 @@ public class MessageListener implements ChatMessageListener, ChatStateListener  
             ChatMessage storableChatMessage = new ChatMessage(message.getBody(),
                     storableUsername,
                     false,
-                    time);
+                    time,
+                    message.getBody());
             db.insert(storableChatMessage);
         }
     }

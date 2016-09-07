@@ -1,7 +1,7 @@
 package br.chatup.tcc.utils;
 
 import android.app.Activity;
-import android.util.Log;
+import android.view.View;
 
 import java.nio.charset.Charset;
 
@@ -12,6 +12,10 @@ public class Util {
 
     public static String getTagForClass(Class clazz) {
         return Constants.LOG_TAG + clazz.getSimpleName();
+    }
+
+    public static String getStringResource(View v, int id) {
+        return v.getResources().getString(id);
     }
 
     public static String getStringResource(Activity activity, int id) {
@@ -26,8 +30,8 @@ public class Util {
     public static String toCapital(String str) {
         String cap = "";
 
-        for(int cont = 0; cont < str.length(); cont++) {
-            if(cont == 0)
+        for (int cont = 0; cont < str.length(); cont++) {
+            if (cont == 0)
                 cap += Character.toUpperCase(str.charAt(cont));
             else
                 cap += str.charAt(cont);
@@ -35,7 +39,7 @@ public class Util {
         return cap;
     }
 
-    public static String parseContactName (String contactJID) {
+    public static String parseContactName(String contactJID) {
         String[] split = contactJID.split("@");
         String pJID = split[0];
         pJID = pJID.toUpperCase();
@@ -44,11 +48,10 @@ public class Util {
     }
 
     public static boolean anyNull(Object[] fields) {
-        for(Object o : fields)
-            if(o == null) return true;
+        for (Object o : fields)
+            if (o == null) return true;
         return false;
     }
-
 
 
 }

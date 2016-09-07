@@ -3,24 +3,29 @@
     <string name="servr_client_id">468641700472-tnritscfo840jcce0qd43qorbl192se5.apps.googleusercontent.com</string>
 
     <string name="app_name">ChatUp</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Abrir Navegação</string>
+    <string name="navigation_drawer_close">Fechar Navegação</string>
 
     <string name="action_settings">Configurações</string>
 
     <!-- Globals -->
     <string name="conn_to_srv">Conectando...</string>
-    <string name="please_wait">Por favor aguarde...</string>
-    <string name="confirm">Confirm</string>
+    <string name="please_wait">Por Favor Aguarde...</string>
+    <string name="confirm">Confirmar</string>
+    <string name="search">Buscar</string>
+    <string name="add_to_contacts">Adicionar aos contatos</string>
+    <string name="translated_message">Mensagem traduzida</string>
+    <string name="close">Fechar</string>
 
     <!-- LoginActivity -->
     <string name="signin">Entrar</string>
     <string name="email">Email</string>
     <string name="password">Senha</string>
-    <string name="please_type_email_pass">Por favor, digite seu email e senha</string>
-    <string name="connection_finished">Conexão fechada</string>
-    <string name="welcome">Bem vindo</string>
+    <string name="please_type_email_pass">Por favor, digite teu email e senha</string>
+    <string name="connection_finished">Conexão encerrada</string>
+    <string name="welcome">Bem Vindo</string>
     <string name="signup">Registrar-se</string>
+    <string name="login">Login</string>
     <string name="login_failed">Falha no login</string>
 
     <!-- MainActivity -->
@@ -28,12 +33,12 @@
     <string name="backup">Backup</string>
 
     <!-- RegisterActivity -->
-    <string name="sorry_an_error_occured">Desculpe, ocorreu um erro. Verifique a conexão e tente novamente mais tarde</string>
+    <string name="sorry_an_error_occured">Desculpe, um erro ocorreu. Verifique tua conexão e tente novamente</string>
     <string name="repeat_password">Repita a senha</string>
-    <string name="name">Name</string>
-    <string name="username">Nome de usuário</string>
-    <string name="new_user">Novo usuárior</string>
+    <string name="name">Nome</string>
+    <string name="username">Nome de Usuário</string>
+    <string name="new_user">Novo Usuário</string>
     <string name="all_fields_are_required">Todos os campos são obrigatórios</string>
-    <string name="password_dont_match">Senhas não conferem</string>
+    <string name="password_dont_match">Senhas não coincidem</string>
     <string name="user_registered_successfully">Usuário registrado com sucesso</string>
 </resources>
