@@ -10,7 +10,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/unnamed"
+        android:src="@drawable/unknown"
         android:id="@+id/imgvUserPhoto_ContactDetails" />
 
     <TextView

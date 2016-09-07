@@ -264,6 +264,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(String... params) {
                 String w = params[0];
+                //TODO: Fix NullPointer on below line when sending a message after accessing ChatActivity through a notification
                 if(!langTo.equals(xmppService.getXmppManager().getUser().getProperties().get("property").getValue())) {
                     w.replaceAll(" ", "%20");
 

@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "ON_START");
         bindService(xmppServiceIntent, mConnection, 0);
     }
 
@@ -106,6 +105,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
+        Log.d(TAG, "ON_STOP");
         super.onStop();
         if(serviceConnected)
             unbindService(mConnection);
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        //stopService(xmppServiceIntent); //Do not stop service here, for receiving message even with the application closed
+        Log.d(TAG, "ON_DESTROY");
         super.onDestroy();
     }
 
@@ -138,12 +138,9 @@ public class MainActivity extends AppCompatActivity
                 xmppServiceIntent.putExtra("user", JsonParser.toJson(user));
                 //Initialize values on gui
                 String displayableUsername = Util.toCapital(user.getUsername());
-                if (!connected) {
-                    /*Starting services, it will be kept started through the whole application. Activities will be able
-                    to bind to it when access to service is required*/
-                    startService(xmppServiceIntent);
-                    connected = true;
-                }
+                /*Starting services, it will be kept started through the whole application. Activities will be able
+                to bind to it when access to service is required*/
+                startService(xmppServiceIntent);
             }
             else {
                 backToLogin();
@@ -197,7 +194,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
         } else if (id == R.id.nav_logout) {
             CacheStorage.deactivateUser(this);
-            xmppService.disconnect();
+            //Disconnect from the server and destroy the service
             xmppService.stopSelf();
             Intent i = new Intent(this, LoginActivity.class);
             startActivity(i);

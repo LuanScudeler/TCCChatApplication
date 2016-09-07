@@ -30,6 +30,17 @@
     <!-- MainActivity -->
     <string name="exit">Exit</string>
     <string name="backup">Backup</string>
+    <string name="activeChats">Chats</string>
+
+    <!-- ContactsActivity -->
+    <string name="contacts">Contacts</string>
+
+    <!-- RegisterActivity -->
+    <string name="registerActivity">Sign up</string>
+    <!-- SearchContactActivity -->
+    <string name="searchContacts">Contact Search</string>
+    <!-- ContactDetailsActivity -->
+    <string name="contactDetails">Contacts Details</string>
 
     <!-- RegisterActivity -->
     <string name="sorry_an_error_occured">Sorry! An error occured, check your internet connection and try again later</string>

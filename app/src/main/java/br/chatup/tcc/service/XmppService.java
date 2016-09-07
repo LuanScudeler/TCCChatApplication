@@ -42,8 +42,8 @@ public class XmppService extends Service {
     private XmppManager xmppManager;
     private ProgressDialog pDialog;
     private AbstractXMPPConnection connection;
-    private boolean connected;
     private static final String TAG = Util.getTagForClass(XmppService.class);
+    private boolean connected;
 
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 
@@ -85,34 +85,37 @@ public class XmppService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
-            User user = JsonParser.fromJson(User.class, intent.getExtras().getString("user"));
-            Log.i(TAG, "User :" + user);
-            xmppManager = new XmppManager(user);
-            if(!connected){
+        Log.i(TAG, "[onStartCommand] Starting service");
+        if(!connected) {
+            try {
+                User user = JsonParser.fromJson(User.class, intent.getExtras().getString("user"));
+                Log.i(TAG, "User :" + user);
+                xmppManager = new XmppManager(user);
                 xmppManager.init();
                 xmppManager.connect();
                 connected = true;
-            } else {
-                Log.i(TAG, "Already connected to server");
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SmackException e) {
+                e.printStackTrace();
             }
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
+        }else {
+            Log.i(TAG, "Service already connected");
         }
-        return super.onStartCommand(intent, flags, startId);
+        //TODO: Fix cachedChats not working when application process is killed and then restored
+        //Prevents application from crashing when process is killed. Service doesn't restart automatically
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "[onDestroy] Destroying service");
         xmppManager.disconnect();
+        connected = false;
         unregisterReceiver(mMessageReceiver);
         super.onDestroy();
-        Log.i(TAG, "onDestroy");
-        //Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
     }
 
     public void init(User user) throws XMPPException, IOException, SmackException {

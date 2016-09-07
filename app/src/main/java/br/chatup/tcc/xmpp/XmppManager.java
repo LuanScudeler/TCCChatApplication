@@ -8,6 +8,7 @@ import android.util.Log;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -48,6 +49,10 @@ public class XmppManager {
                 .setSendPresence(true)
                 .setDebuggerEnabled(true)
                 .build();
+
+        //Try to avoid SASL error when authenticating user in the server
+        SASLAuthentication.unBlacklistSASLMechanism("PLAIN");
+        SASLAuthentication.blacklistSASLMechanism("DIGEST-MD5");
 
         conn = new XMPPTCPConnection(configuration);
         conn.setPacketReplyTimeout(REPLAY_TIMEOUT);
@@ -90,6 +95,7 @@ public class XmppManager {
     }
 
     public void disconnect() {
+        Log.i(TAG, "[DISCONNECTING] Disconnecting from server" );
         conn.disconnect();
     }
 
