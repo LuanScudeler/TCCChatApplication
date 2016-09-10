@@ -202,6 +202,10 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
             finish();
         }
+        else if (id == R.id.nav_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -210,20 +214,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.chats, menu);
 
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.toggle_translation) {
+        /*if(item.getItemId() == R.id.toggle_translation) {
             if(App.isTranslationEnabled())
                 App.setTranslationEnabled(false);
             else
                 App.setTranslationEnabled(true);
             String currTranslationMode = App.isTranslationEnabled()?"ON":"OFF";
             Toast.makeText(getApplicationContext(), "Translation mode: " + currTranslationMode, Toast.LENGTH_SHORT).show();
-        }
+        }*/
         return true;
     }
 }

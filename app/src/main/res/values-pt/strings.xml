@@ -16,6 +16,9 @@
     <string name="add_to_contacts">Adicionar aos contatos</string>
     <string name="translated_message">Mensagem traduzida</string>
     <string name="close">Fechar</string>
+    <string name="settings">Configurações</string>
+    <string name="translation">Tradução</string>
+    <string name="language">Idioma</string>
 
     <!-- LoginActivity -->
     <string name="signin">Entrar</string>

@@ -35,8 +35,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="br.chatup.tcc.activity.ContactsActivity"
-            android:label="@string/contacts"/>
+        <activity
+            android:name="br.chatup.tcc.activity.ContactsActivity"
+            android:label="@string/contacts" />
         <activity
             android:name="br.chatup.tcc.activity.ChatActivity"
             android:parentActivityName="br.chatup.tcc.activity.MainActivity">
@@ -44,12 +45,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.chatup.tcc.activity.MainActivity" />
         </activity>
-        <activity android:name="br.chatup.tcc.activity.RegisterActivity"
-            android:label="@string/registerActivity"/>
-        <activity android:name="br.chatup.tcc.activity.SearchContactActivity"
-            android:label="@string/searchContacts"/>
-        <activity android:name="br.chatup.tcc.activity.ContactDetailsActivity"
-            android:label="@string/contactDetails"/>
+        <activity
+            android:name="br.chatup.tcc.activity.RegisterActivity"
+            android:label="@string/registerActivity" />
+        <activity
+            android:name="br.chatup.tcc.activity.SearchContactActivity"
+            android:label="@string/searchContacts" />
+        <activity
+            android:name="br.chatup.tcc.activity.ContactDetailsActivity"
+            android:label="@string/contactDetails" />
+        <activity android:name="br.chatup.tcc.activity.SettingsActivity"></activity>
     </application>
 
 </manifest>
