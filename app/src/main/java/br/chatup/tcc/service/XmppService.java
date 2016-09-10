@@ -1,35 +1,23 @@
 package br.chatup.tcc.service;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.Service;
-import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jxmpp.util.XmppStringUtils;
 
-import java.io.IOException;
-
 import br.chatup.tcc.activity.ChatActivity;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.chat.MessageListener;
-import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 import br.chatup.tcc.xmpp.XmppManager;
@@ -40,23 +28,21 @@ import br.chatup.tcc.xmpp.XmppManager;
 public class XmppService extends Service {
 
     private XmppManager xmppManager;
-    private ProgressDialog pDialog;
     private AbstractXMPPConnection connection;
     private ChatManager chatManager;
     private static final String TAG = Util.getTagForClass(XmppService.class);
-    private boolean connected;
 
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(action.equals("BROADCAST_ON_SERVICE")) {
-                Log.i(TAG, "BroadCast received on service");
-                ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
-                String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
-                raiseNotification(contactJID, message.getBody());
-            }
+        String action = intent.getAction();
+        if(action.equals("BROADCAST_ON_SERVICE")) {
+            Log.i(TAG, "BroadCast received on service");
+            ChatMessage message = (ChatMessage)intent.getSerializableExtra("message");
+            String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
+            Util.showNotification(getApplicationContext(), ChatActivity.class,contactJID, message.getBody());
+        }
         }
     };
 
@@ -86,6 +72,7 @@ public class XmppService extends Service {
         Log.i(TAG, "Initializing listeners");
         if(connection!=null){
             chatManager = ChatManager.getInstanceFor(connection);
+            Log.i(TAG, chatManager.toString());
             chatManager.addChatListener(new ChatManagerListener() {
                 @Override
                 public void chatCreated(Chat chat, boolean createdLocally) {
@@ -100,33 +87,28 @@ public class XmppService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "[onStartCommand] Starting service");
-        if(!connected) {
-            try {
-                User user = JsonParser.fromJson(User.class, intent.getExtras().getString("user"));
-                Log.i(TAG, "User :" + user);
-                xmppManager = new XmppManager(user);
-                xmppManager.init();
-                xmppManager.connect();
-                connected = true;
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (SmackException e) {
-                e.printStackTrace();
-            }
+
+        User user = JsonParser.fromJson(User.class, intent.getExtras().getString("user"));
+        Log.i(TAG, "User :" + user);
+
+        xmppManager = new XmppManager(user);
+        xmppManager.init();
+
+        if(!XmppManager.getConn().isConnected()) {
+            xmppManager.connect();
         }else {
-            Log.i(TAG, "Service already connected");
+            Log.i(TAG, "User already connected");
         }
+
         //Prevents application from crashing when process is killed. Service doesn't restart automatically
         return START_NOT_STICKY;
     }
+
 
     @Override
     public void onDestroy() {
         Log.i(TAG, "[onDestroy] Destroying service");
         xmppManager.disconnect();
-        connected = false;
         unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
@@ -135,47 +117,12 @@ public class XmppService extends Service {
         return chatManager;
     }
 
-    public void init(User user) throws XMPPException, IOException, SmackException {
-        Log.i(TAG, "init: " + user);
-        xmppManager = new XmppManager(user);
-        xmppManager.init();
+    public void disconnect(){
+        xmppManager.disconnect();
     }
 
-    public XmppManager getXmppManager(){return xmppManager;}
-
-    private void raiseNotification(String contactJID, String msgBody) {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon_mdpi)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_icon_xhdpi))
-                .setTicker("New message!")
-                .setContentTitle(XmppStringUtils.parseLocalpart(contactJID))
-                .setContentText(msgBody)
-                .setAutoCancel(true);
-
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, ChatActivity.class);
-        resultIntent.putExtra("contactJID", contactJID);
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ChatActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        // Get Android notification service
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Configure
-        Notification n = mBuilder.build();
-        n.vibrate = new long[]{150, 300, 150, 600};
-
-        // First parameter refers to notification id, notification can be modified later
-        mNotificationManager.notify(R.drawable.notification_icon_mdpi, n);
+    public XmppManager getXmppManager(){
+        return xmppManager;
     }
+
 }

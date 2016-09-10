@@ -109,47 +109,10 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d(TAG, "[BroadcastReceiver] Raising notification");
                 //For communication to work when opening a chat contactJid must be in bareJid format
                 String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
-                raiseNotification(contactJID, message.getBody());
+                Util.showNotification(getApplicationContext(), ChatActivity.class, contactJID, message.getBody());
             }
         }
     };
-
-    //TODO: Move raiseNotification method to Utils class
-    private void raiseNotification(String contactJID, String msgBody) {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_icon_mdpi)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_icon_xhdpi))
-                .setTicker("New message!")
-                .setContentTitle(XmppStringUtils.parseLocalpart(contactJID))
-                .setContentText(msgBody)
-                .setAutoCancel(true);
-
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, ChatActivity.class);
-        resultIntent.putExtra("contactJID", contactJID);
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ChatActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        // Get Android notification service
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Configure
-        Notification n = mBuilder.build();
-        n.vibrate = new long[]{150, 300, 150, 600};
-
-        // First parameter refers to notification id, notification can be modified later
-        mNotificationManager.notify(R.drawable.notification_icon_mdpi, n);
-    }
 
     @Override
     protected void onStart() {

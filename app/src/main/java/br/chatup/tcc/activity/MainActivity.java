@@ -39,6 +39,7 @@ import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.App;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
+import br.chatup.tcc.xmpp.XmppManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,8 +52,6 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog pDialog;
     private Intent xmppServiceIntent;
     private static boolean serviceConnected;
-    private boolean created;
-    private boolean connected;
     private static XmppService xmppService;
     private User user;
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -85,7 +84,6 @@ public class MainActivity extends AppCompatActivity
         bindService(xmppServiceIntent, mConnection, 0);
     }
 
-    //TODO: Manage broadcastReceiver properly throughout the activity lifecycle
     @Override
     protected void onResume() {
         // Register to receive messages.
@@ -124,6 +122,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        App.setCurrentActivity(this);
+
         txtHelloUser = (TextView) findViewById(R.id.txtHelloUser);
         txtUsernameNavHeader = (TextView) findViewById(R.id.txtUsername_NavHeader);
         txtEmailNavHeader = (TextView) findViewById(R.id.txtEmail_NavHeader);
@@ -136,13 +136,14 @@ public class MainActivity extends AppCompatActivity
                 txtHelloUser.setText(user.getUsername());
                 txtUsernameNavHeader.setText(user.getUsername());
                 txtEmailNavHeader.setText(user.getEmail());
+
                 xmppServiceIntent = new Intent(getBaseContext(), XmppService.class);
                 xmppServiceIntent.putExtra("user", JsonParser.toJson(user));
-                //Initialize values on gui
-                String displayableUsername = Util.toCapital(user.getUsername());
                 /*Starting services, it will be kept started through the whole application. Activities will be able
                 to bind to it when access to service is required*/
-                startService(xmppServiceIntent);
+                //Check if conn is null, this happens in case the app was closed and reopened. And user is in cache
+                if(XmppManager.getConn()==null)
+                    startService(xmppServiceIntent);
             }
             else {
                 backToLogin();
@@ -197,12 +198,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             CacheStorage.deactivateUser(this);
             //Disconnect from the server and destroy the service
+            xmppService.disconnect();
             xmppService.stopSelf();
             Intent i = new Intent(this, LoginActivity.class);
             startActivity(i);
             finish();
-        }
-        else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_settings) {
             Intent i = new Intent(this, SettingsActivity.class);
             startActivity(i);
         }
@@ -214,19 +215,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        /*if(item.getItemId() == R.id.toggle_translation) {
-            if(App.isTranslationEnabled())
-                App.setTranslationEnabled(false);
-            else
-                App.setTranslationEnabled(true);
-            String currTranslationMode = App.isTranslationEnabled()?"ON":"OFF";
-            Toast.makeText(getApplicationContext(), "Translation mode: " + currTranslationMode, Toast.LENGTH_SHORT).show();
-        }*/
+        super.onOptionsItemSelected(item);
         return true;
     }
 }

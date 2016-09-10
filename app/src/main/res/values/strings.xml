@@ -11,6 +11,9 @@
     <!-- Globals -->
     <string name="conn_to_srv">Connecting...</string>
     <string name="please_wait">Please wait...</string>
+    <string name="retrieving_data">Retrieving user data...</string>
+    <string name="connection_error">Connection error</string>
+    <string name="try_to_reconnect">Please try to reconnect</string>
     <string name="confirm">Confirm</string>
     <string name="search">Search</string>
     <string name="add_to_contacts">Add to contacts</string>
