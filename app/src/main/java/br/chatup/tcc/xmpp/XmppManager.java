@@ -27,6 +27,7 @@ import br.chatup.tcc.activity.MainActivity;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.myapplication.R;
+import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.App;
 import br.chatup.tcc.utils.AsyncTaskResult;
 import br.chatup.tcc.utils.Constants;
@@ -46,6 +47,7 @@ public class XmppManager extends App {
     private User user;
     private Activity currActivity;
     private ProgressDialog pDialog;
+    private AlertDialog alert;
 
     public XmppManager(User user) {
         this.user = user;
@@ -90,8 +92,7 @@ public class XmppManager extends App {
                 currActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //TODO: Fix dialog not showing properly inside thread
-                        //showAlertDialog(currActivity, R.string.connection_error, R.string.try_to_reconnect);
+                        showAlertDialog(App.getCurrentActivity(), R.string.connection_error, R.string.try_to_reconnect);
                     }
                 });
             }
@@ -120,23 +121,21 @@ public class XmppManager extends App {
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        alert.dismiss();
                         backToLogin();
                     }
                 });
-        AlertDialog alert = builder.create();
-
-        Log.d(TAG, "[currActivity] " + App.getCurrentActivity());
-        if (!currActivity.isFinishing()) {
-            alert.show();
-        }
+        alert = builder.create();
+        alert.show();
     }
 
     public void backToLogin() {
-        //TODO: Finalize connection and service for them to restart properly
-        conn.disconnect();
-        Intent i = new Intent(currActivity, LoginActivity.class);
-        currActivity.startActivity(i);
-        currActivity.finish();
+        disconnect();
+
+        Intent i = new Intent(App.getCurrentActivity(), LoginActivity.class);
+
+        App.getCurrentActivity().startActivity(i);
+        App.getCurrentActivity().finish();
     }
 
     public void disconnect() {

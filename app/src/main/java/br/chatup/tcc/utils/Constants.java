@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Constants {
 
     public static final String XMPP_SERVER_IP = "52.67.111.6";
+    public static final String XMPP_SERVER_RESOURCE = "/Smack";
     public static final int XMPP_SERVER_RESTAPI_PORT = 9090;
     public static final int XMPP_SERVER_PORT = 5222;
     public static final String XMPP_SERVER_RESTAPI_PATH = "/plugins/restapi/v1";

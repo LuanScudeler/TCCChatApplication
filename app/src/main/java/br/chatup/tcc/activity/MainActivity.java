@@ -198,7 +198,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             CacheStorage.deactivateUser(this);
             //Disconnect from the server and destroy the service
-            xmppService.disconnect();
             xmppService.stopSelf();
             Intent i = new Intent(this, LoginActivity.class);
             startActivity(i);
