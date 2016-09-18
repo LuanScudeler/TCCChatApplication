@@ -1,14 +1,13 @@
 package br.chatup.tcc.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -17,33 +16,20 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
-import org.jxmpp.util.XmppStringUtils;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import br.chatup.tcc.adapters.ContactsListAdapter;
-import br.chatup.tcc.bean.User;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
 import br.chatup.tcc.service.XmppService;
-import br.chatup.tcc.utils.Constants;
-import br.chatup.tcc.utils.JsonParser;
-import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
-import br.chatup.tcc.xmpp.XmppManager;
 
 public class ContactsActivity extends AppCompatActivity {
 
@@ -102,6 +88,15 @@ public class ContactsActivity extends AppCompatActivity {
         //Load list of contacts in the screen
         LoadRosterTask lrt = new LoadRosterTask();
         lrt.execute();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getBaseContext(), SearchContactActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -114,8 +109,6 @@ public class ContactsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.search_contacts_item_menu) {
-            Intent i = new Intent(getBaseContext(), SearchContactActivity.class);
-            startActivity(i);
         }
         return true;
     }
@@ -164,7 +157,6 @@ public class ContactsActivity extends AppCompatActivity {
             pDialog = new ProgressDialog(ContactsActivity.this);
             pDialog.setMessage("Loading...");
             pDialog.show();
-
         }
 
         @Override
