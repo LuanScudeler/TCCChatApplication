@@ -245,7 +245,7 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 protected String[] doInBackground(String[] params) {
                     message = params[0];
-                    message = message.replaceAll(" ", "%20");
+                    message.replaceAll("\\s", "%20");
 
                     ResponseEntity<String> re = RestFacade.post(Constants.TOKEN_SERVICE_URL, Constants.TOKEN_SERVICE_URI_PARAMS);
                     String r = re.getBody();
