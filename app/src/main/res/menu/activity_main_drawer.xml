@@ -5,16 +5,16 @@
 
         <item
             android:id="@+id/nav_contacts"
-            android:icon="@drawable/contacts_list_icon"
+            android:icon="@drawable/account_network"
             android:title="Contacts" />
         <item
             android:id="@+id/nav_settings"
-            android:icon="@mipmap/ic_settings_black_18dp"
+            android:icon="@drawable/settings"
             android:title="@string/settings"/>
 
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/logout_icon"
+            android:icon="@drawable/logout"
             android:title="Logout" />
     </group>
 

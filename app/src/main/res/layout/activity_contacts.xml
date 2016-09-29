@@ -22,7 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/add_contact_icon"
+        android:src="@drawable/account_multiple_plus"
         app:backgroundTint="?attr/colorPrimary"/>
 
 </RelativeLayout>

@@ -10,8 +10,6 @@ import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -57,9 +55,12 @@ public class ContactsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         Log.d(TAG, "ON_START");
+        super.onStart();
         Intent i = new Intent(ContactsActivity.this, XmppService.class);
         bindService(i, mConnection, 0);
-        super.onStart();
+        //Load list of contacts in the screen
+        LoadRosterTask lrt = new LoadRosterTask();
+        lrt.execute();
     }
 
     @Override
@@ -78,17 +79,6 @@ public class ContactsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        contactsListView = (ListView)findViewById(R.id.lvContacts);
-        customAdapter = new ContactsListAdapter(this,
-                R.layout.contact_list_itemlistrow,
-                entriesList);
-        contactsListView.setAdapter(customAdapter);
-        contactsListView.setOnItemClickListener(openChatActivity());
-
-        //Load list of contacts in the screen
-        LoadRosterTask lrt = new LoadRosterTask();
-        lrt.execute();
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,22 +89,9 @@ public class ContactsActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.contacts, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.search_contacts_item_menu) {
-        }
-        return true;
-    }
 
     private AdapterView.OnItemClickListener openChatActivity() {
-        return(new AdapterView.OnItemClickListener() {
+        return (new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String contactJIDSelected = entriesList.get(position).getUser();
@@ -125,7 +102,7 @@ public class ContactsActivity extends AppCompatActivity {
         });
     }
 
-    public void startRosterPresenceListener(Roster roster){
+    public void startRosterPresenceListener(Roster roster) {
 
         roster.addRosterListener(new RosterListener() {
             @Override
@@ -155,13 +132,13 @@ public class ContactsActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(ContactsActivity.this);
-            pDialog.setMessage("Loading...");
+            pDialog.setMessage(getString(R.string.please_wait));
             pDialog.show();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            while(!serviceConnected);
+            while (!serviceConnected) ;
             Log.i(TAG, "doInBackground: service connected...");
 
             //Set subscriptionMode on "accept_all" users will automatically accept invite requests
@@ -174,22 +151,27 @@ public class ContactsActivity extends AppCompatActivity {
             //String userJID = "luan@10.172.32.71";
             //String nickName = "luan";
             //addUserForTest(roster, userJID, nickName);
-
+            entriesList = new ArrayList<RosterEntry>();
             //Get all rosters
             Collection<RosterEntry> entries = roster.getEntries();
             entriesList.addAll(entries);
 
             for (RosterEntry entry : entriesList) {
-                Log.d(TAG, "Entry: JID: " +  entry.getUser() + " Nickname: " + entry.getName());
+                Log.d(TAG, "Entry: JID: " + entry.getUser() + " Nickname: " + entry.getName());
             }
             //update the list
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    contactsListView = (ListView) findViewById(R.id.lvContacts);
+                    customAdapter = new ContactsListAdapter(ContactsActivity.this,
+                            R.layout.contact_list_itemlistrow,
+                            entriesList);
+                    contactsListView.setAdapter(customAdapter);
+                    contactsListView.setOnItemClickListener(openChatActivity());
                     ((ArrayAdapter) contactsListView.getAdapter()).notifyDataSetChanged();
                 }
             });
-
             return null;
         }
 

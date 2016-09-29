@@ -1,23 +1,15 @@
 package br.chatup.tcc.activity;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,7 +17,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,10 +24,6 @@ import com.google.gson.JsonParser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
-import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.roster.Roster;
 import org.jxmpp.util.XmppStringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -45,11 +32,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import br.chatup.tcc.adapters.ChatContainerAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
-import br.chatup.tcc.cache.CacheStorage;
 import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
@@ -94,7 +81,7 @@ public class ChatActivity extends AppCompatActivity {
 
     /**
      * FullJID composed by localPart@Domain/Resource
-     * <p/>
+     * <p>
      * localPart: username
      * Domain: Server address
      * Resource: "/Smack"
@@ -174,7 +161,7 @@ public class ChatActivity extends AppCompatActivity {
         db = new AppDataSource(this);
 
         //Get contactJID from selected user
-        contactJID = getIntent().getExtras().getString("contactJID").toString();
+        contactJID = getIntent().getExtras().getString("contactJID");
         //username for controlling notification behavior
         currActiveChat = XmppStringUtils.parseLocalpart(contactJID);
 
@@ -231,14 +218,14 @@ public class ChatActivity extends AppCompatActivity {
         if (edtMessageBody.getText().toString().isEmpty()) return;
 
         String messageBody = edtMessageBody.getText().toString();
-        String time = new SimpleDateFormat("HH:mm").format(new Date());
+        String time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
         chatMessage = new ChatMessage(messageBody, contactJID, true, time, messageBody);
 
-        if(App.isTranslationEnabled()){
+        if (App.isTranslationEnabled()) {
             displayMessage(chatMessage);
             translateAndSend();
-        }else{
-            sendMessage(messageBody,messageBody);
+        } else {
+            sendMessage(messageBody, messageBody);
             displayMessage(chatMessage);
             edtMessageBody.setText("");
         }
@@ -258,7 +245,7 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 protected String[] doInBackground(String[] params) {
                     message = params[0];
-                    message.replaceAll(" ", "%20");
+                    message = message.replaceAll(" ", "%20");
 
                     ResponseEntity<String> re = RestFacade.post(Constants.TOKEN_SERVICE_URL, Constants.TOKEN_SERVICE_URI_PARAMS);
                     String r = re.getBody();
@@ -305,15 +292,12 @@ public class ChatActivity extends AppCompatActivity {
         try {
             Log.d(TAG, "[SENDING MESSAGE] Body: " + messageBodyTranslated + " | User: " + messageReceiver + " | ThreadID: " + newChat.getThreadID());
             newChat.sendMessage(messageBodyTranslated);
-        } catch(SmackException.NotConnectedException e) {
-            success = false;
-            e.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             success = false;
             e.printStackTrace();
         }
         //Save messages history
-        if(success) {
+        if (success) {
             //"contact" in database must be only de username portion of the JID
             chatMessage.setReceiver(XmppStringUtils.parseLocalpart(chatMessage.getReceiver()));
             db.insert(chatMessage);

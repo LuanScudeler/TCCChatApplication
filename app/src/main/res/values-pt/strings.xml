@@ -19,6 +19,7 @@
     <string name="settings">Configurações</string>
     <string name="translation">Tradução</string>
     <string name="language">Idioma</string>
+    <string name="contact_added_successfully">Contato Adicionado Com Sucesso</string>
 
     <!-- LoginActivity -->
     <string name="signin">Entrar</string>
