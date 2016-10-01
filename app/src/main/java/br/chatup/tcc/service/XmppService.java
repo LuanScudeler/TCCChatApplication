@@ -49,7 +49,7 @@ public class XmppService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "Creating service");
+        Log.i(TAG, "[onCreate] Registering receiver");
 
         IntentFilter it = new IntentFilter();
         it.addAction("BROADCAST_ON_SERVICE");
@@ -60,19 +60,17 @@ public class XmppService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(TAG, "onBind");
-
         connection = XmppManager.getConn();
+
+        Log.i(TAG, "[onBind] Initializing listeners");
         initializeChatListener();
 
         return new LocalBinder<XmppService>(this);
     }
 
     private void initializeChatListener() {
-        Log.i(TAG, "Initializing listeners");
         if(connection!=null){
             chatManager = ChatManager.getInstanceFor(connection);
-            Log.i(TAG, chatManager.toString());
             chatManager.addChatListener(new ChatManagerListener() {
                 @Override
                 public void chatCreated(Chat chat, boolean createdLocally) {
@@ -89,7 +87,7 @@ public class XmppService extends Service {
         Log.i(TAG, "[onStartCommand] Starting service");
 
         User user = JsonParser.fromJson(User.class, intent.getExtras().getString("user"));
-        Log.i(TAG, "User :" + user);
+        Log.i(TAG, "User connecting:" + user);
 
         xmppManager = new XmppManager(user);
         xmppManager.init();

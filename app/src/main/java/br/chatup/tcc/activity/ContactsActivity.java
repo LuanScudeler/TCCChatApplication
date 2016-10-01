@@ -43,12 +43,11 @@ public class ContactsActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             xmppService = ((LocalBinder<XmppService>) iBinder).getService();
             serviceConnected = true;
-            Log.d(TAG, "onServiceConnected: " + xmppService);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            Log.d(TAG, "onServiceDisconnected: ");
+            Log.d(TAG, "onServiceDisconnected");
         }
     };
 
@@ -157,7 +156,7 @@ public class ContactsActivity extends AppCompatActivity {
             entriesList.addAll(entries);
 
             for (RosterEntry entry : entriesList) {
-                Log.d(TAG, "Entry: JID: " + entry.getUser() + " Nickname: " + entry.getName());
+                //Log.d(TAG, "Entry: JID: " + entry.getUser() + " Nickname: " + entry.getName());
             }
             //update the list
             runOnUiThread(new Runnable() {

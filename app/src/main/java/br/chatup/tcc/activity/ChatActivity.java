@@ -89,18 +89,18 @@ public class ChatActivity extends AppCompatActivity {
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ChatMessage message = (ChatMessage) intent.getSerializableExtra("message");
-            Log.d(TAG, "[BroadcastReceiver] Message received | From: " + message.getReceiver() + " | Body: " + message.getBody());
+        ChatMessage message = (ChatMessage) intent.getSerializableExtra("message");
+        Log.d(TAG, "[BroadcastReceiver] Message received | From: " + message.getReceiver() + " | Body: " + message.getBody());
 
-            String senderUsername = XmppStringUtils.parseLocalpart(message.getReceiver());
-            if (senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID)))
-                displayMessage(message);
-            else {
-                Log.d(TAG, "[BroadcastReceiver] Raising notification");
-                //For communication to work when opening a chat contactJid must be in bareJid format
-                String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
-                Util.showNotification(getApplicationContext(), ChatActivity.class, contactJID, message.getBody());
-            }
+        String senderUsername = XmppStringUtils.parseLocalpart(message.getReceiver());
+        if (senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID)))
+            displayMessage(message);
+        else {
+            Log.d(TAG, "[BroadcastReceiver] Raising notification");
+            //For communication to work when opening a chat contactJid must be in bareJid format
+            String contactJID = XmppStringUtils.parseBareJid(message.getReceiver());
+            Util.showNotification(getApplicationContext(), ChatActivity.class, contactJID, message.getBody());
+        }
         }
     };
 
@@ -177,7 +177,7 @@ public class ChatActivity extends AppCompatActivity {
             protected String doInBackground(Void... params) {
                 ResponseEntity<String> resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJID.split("@")[0]));
                 User u = br.chatup.tcc.utils.JsonParser.fromJson(User.class, resp.getBody());
-                Log.i(TAG, "doInBackground: " + u);
+                Log.i(TAG, "Retrieved receptor properties: " + u.getProperties().get("property").getValue());
                 return u.getProperties().get("property").getValue();
             }
 
@@ -222,9 +222,11 @@ public class ChatActivity extends AppCompatActivity {
         chatMessage = new ChatMessage(messageBody, contactJID, true, time, messageBody);
 
         if (App.isTranslationEnabled()) {
+            Log.i(TAG, "Sending message, translation mode is now: " + App.isTranslationEnabled());
             displayMessage(chatMessage);
             translateAndSend();
         } else {
+            Log.i(TAG, "Sending message, translation mode is now: " + App.isTranslationEnabled());
             sendMessage(messageBody, messageBody);
             displayMessage(chatMessage);
             edtMessageBody.setText("");
@@ -275,6 +277,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }.execute(edtMessageBody.getText().toString());
         } else {
+            Log.d(TAG, "[Translation skipped] Users have the same language");
             sendMessage(edtMessageBody.getText().toString(), edtMessageBody.getText().toString());
         }
     }

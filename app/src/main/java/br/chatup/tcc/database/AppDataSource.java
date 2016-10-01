@@ -51,11 +51,11 @@ public class AppDataSource implements ChatMessagesDao {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             ChatMessage chatMessage = cursorToModelo(cursor);
-            Log.d(TAG, "[findAllByContact] contact: " + chatMessage.getReceiver() +
+            /*Log.d(TAG, "[findAllByContact] contact: " + chatMessage.getReceiver() +
                     " | msgBody: " + chatMessage.getBody() +
                     " | isMe: " + chatMessage.isMe() +
                     " | date: " + chatMessage.getDate() +
-                    " | messageBodyTranslated: " + chatMessage.getBodyTranslated());
+                    " | messageBodyTranslated: " + chatMessage.getBodyTranslated());*/
             chatMessageList.add(chatMessage);
             cursor.moveToNext();
         }

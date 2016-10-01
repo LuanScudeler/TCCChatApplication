@@ -2,7 +2,7 @@
     <!-- oauth -->
     <string name="servr_client_id">468641700472-tnritscfo840jcce0qd43qorbl192se5.apps.googleusercontent.com</string>
 
-    <string name="app_name">ChatUp</string>
+    <string name="app_name">Meazer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -38,7 +38,7 @@
     <!-- MainActivity -->
     <string name="exit">Exit</string>
     <string name="backup">Backup</string>
-    <string name="activeChats">Chats</string>
+    <string name="activeChats">Meazer</string>
 
     <!-- ContactsActivity -->
     <string name="contacts">Contacts</string>

@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         // Register to receive messages.
         // Registering an observer (mMessageReceiver) to receive Intents
-        Log.d(TAG, "ON_RESUME");
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("receivedMessage"));
         super.onResume();
@@ -96,7 +95,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "ON_PAUSE");
         // Unregister since the activity is paused.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(
                 mMessageReceiver);
@@ -105,7 +103,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "ON_STOP");
         super.onStop();
         if(serviceConnected)
             unbindService(mConnection);
@@ -113,7 +110,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "ON_DESTROY");
         super.onDestroy();
     }
 
