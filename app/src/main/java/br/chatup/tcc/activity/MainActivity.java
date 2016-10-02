@@ -7,12 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,20 +20,30 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
+import org.jxmpp.util.XmppStringUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.chatup.tcc.adapters.ActiveChatsListAdapter;
+import br.chatup.tcc.adapters.ContactsListAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
+import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
-import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.App;
+import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 import br.chatup.tcc.xmpp.XmppManager;
@@ -45,15 +52,18 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = Util.getTagForClass(MainActivity.class);
-    private TextView txtHelloUser;
     private TextView txtUsernameNavHeader;
     private TextView txtEmailNavHeader;
+    private ActiveChatsListAdapter customAdapter;
+    private ListView activeChatsListView;
     private ImageView imgViewUserPhoto;
     private ProgressDialog pDialog;
     private Intent xmppServiceIntent;
     private static boolean serviceConnected;
     private static XmppService xmppService;
     private User user;
+    List<String> contactsFromActiveChatsList = new ArrayList<String>();
+    private AppDataSource db;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -119,8 +129,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         App.setCurrentActivity(this);
+        db = new AppDataSource(this);
 
-        txtHelloUser = (TextView) findViewById(R.id.txtHelloUser);
         txtUsernameNavHeader = (TextView) findViewById(R.id.txtUsername_NavHeader);
         txtEmailNavHeader = (TextView) findViewById(R.id.txtEmail_NavHeader);
 
@@ -129,9 +139,10 @@ public class MainActivity extends AppCompatActivity
 
             if (user != null) {
                 //Initialize values on gui
-                txtHelloUser.setText(user.getUsername());
                 txtUsernameNavHeader.setText(user.getUsername());
                 txtEmailNavHeader.setText(user.getEmail());
+
+                initActiveChats();
 
                 xmppServiceIntent = new Intent(getBaseContext(), XmppService.class);
                 xmppServiceIntent.putExtra("user", JsonParser.toJson(user));
@@ -160,10 +171,34 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    public void initActiveChats() {
+        contactsFromActiveChatsList = db.findContactsFromActiveChats();
+
+        activeChatsListView = (ListView) findViewById(R.id.lvActiveChats);
+        customAdapter = new ActiveChatsListAdapter(MainActivity.this,
+                R.layout.active_chats_list_item,
+                contactsFromActiveChatsList);
+        activeChatsListView.setAdapter(customAdapter);
+        activeChatsListView.setOnItemClickListener(openChatActivity());
+        ((ArrayAdapter) activeChatsListView.getAdapter()).notifyDataSetChanged();
+    }
     public void backToLogin() {
         Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);
         finish();
+    }
+
+    private AdapterView.OnItemClickListener openChatActivity() {
+        return (new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Concatenates: username + @ + XMPP_SERVER_IP
+                String contactJIDSelected = XmppStringUtils.completeJidFrom(contactsFromActiveChatsList.get(position), Constants.XMPP_SERVER_IP);
+                Intent i = new Intent(MainActivity.this, ChatActivity.class);
+                i.putExtra("contactJID", contactJIDSelected);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -185,6 +220,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
         } else if (id == R.id.nav_logout) {
             CacheStorage.deactivateUser(this);
+            App.setLogoutRequested(true);
             //Disconnect from the server and destroy the service
             xmppService.stopSelf();
             Intent i = new Intent(this, LoginActivity.class);

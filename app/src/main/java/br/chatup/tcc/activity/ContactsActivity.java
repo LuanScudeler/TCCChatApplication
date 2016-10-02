@@ -94,6 +94,7 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String contactJIDSelected = entriesList.get(position).getUser();
+                Log.d(TAG, "[contactJIDSelected]: " + contactJIDSelected);
                 Intent i = new Intent(ContactsActivity.this, ChatActivity.class);
                 i.putExtra("contactJID", contactJIDSelected);
                 startActivity(i);

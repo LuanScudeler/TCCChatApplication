@@ -110,11 +110,23 @@ public class XmppManager extends App {
             @Override
             public void connectionClosed() {
                 Log.i(TAG, "[connectionClosed]: " + user);
+                //If logoutRequest is false that means that the user didn't want to close the connection
+                if(!App.isLogoutRequested()) {
+                    currActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showAlertDialog(App.getCurrentActivity(), R.string.connection_error, R.string.try_to_reconnect);
+                        }
+                    });
+                }else {
+                    //Set LogoutRequested flag back to false
+                    App.setLogoutRequested(false);
+                }
             }
 
             @Override
             public void connectionClosedOnError(Exception e) {
-                Log.i(TAG, "[connectionClosedOnError] " + user);
+                Log.i(TAG, "[connectionClosedOnError]: " + user);
                 currActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -165,7 +177,7 @@ public class XmppManager extends App {
     }
 
     public void disconnect() {
-        Log.i(TAG, "[DISCONNECTING] Disconnecting from server" );
+        Log.i(TAG, "[DISCONNECTING] Disconnecting from server");
         conn.disconnect();
     }
 

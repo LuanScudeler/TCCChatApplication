@@ -9,9 +9,10 @@ import android.util.Log;
  * Created by Luan on 4/2/2016.
  */
 public class App extends Application {
-    public static Activity mCurrentActivity = null;
-    public static String mCurrentActiveChat = null;
-    public static boolean translationEnabled;
+    private static Activity mCurrentActivity = null;
+    private static String mCurrentActiveChat = null;
+    private static boolean translationEnabled;
+    private static boolean logoutRequested;
     public static Context context;
 
     @Override
@@ -34,6 +35,14 @@ public class App extends Application {
 
     public static void setCurrentActiveChat(String currentActiveChat){
         mCurrentActiveChat = currentActiveChat;
+    }
+
+    public static boolean isLogoutRequested() {
+        return logoutRequested;
+    }
+
+    public static void setLogoutRequested(boolean logoutRequested) {
+        App.logoutRequested = logoutRequested;
     }
 
     public static boolean isTranslationEnabled() {

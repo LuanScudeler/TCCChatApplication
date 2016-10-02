@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.utils.Constants;
@@ -43,15 +44,15 @@ public class AppDataSource implements ChatMessagesDao {
     }
 
     @Override
-    public ArrayList<ChatMessage> findAllByContact(String contact) {
+    public ArrayList<ChatMessage> findAllByContactJID(String contactJID) {
         ArrayList<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
         Cursor cursor = db.
-                rawQuery("SELECT * FROM chatMessages WHERE contact = ?", new String[]{contact});
+                rawQuery("SELECT * FROM chatMessages WHERE contact = ?", new String[]{contactJID});
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            ChatMessage chatMessage = cursorToModelo(cursor);
-            /*Log.d(TAG, "[findAllByContact] contact: " + chatMessage.getReceiver() +
+            ChatMessage chatMessage = cursorToChatMessage(cursor);
+            /*Log.d(TAG, "[findAllByContactJID] contact: " + chatMessage.getReceiver() +
                     " | msgBody: " + chatMessage.getBody() +
                     " | isMe: " + chatMessage.isMe() +
                     " | date: " + chatMessage.getDate() +
@@ -64,7 +65,49 @@ public class AppDataSource implements ChatMessagesDao {
         return chatMessageList;
     }
 
-    private ChatMessage cursorToModelo(Cursor cursor) {
+    @Override
+    public ChatMessage findLastOneByContactJID(String contactJID) {
+        Log.d(TAG, "[findLastOneByContactJID]: Searching on database...");
+        ChatMessage chatMessage = null;
+        Cursor cursor = db.
+                rawQuery("SELECT * FROM chatMessages WHERE contact = ?", new String[]{contactJID});
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            if (cursor.isLast()){
+                chatMessage = cursorToChatMessage(cursor);
+                /*Log.d(TAG, "[findLastOneByContactJID]: " + chatMessage.getReceiver() +
+                        " | msgBody: " + chatMessage.getBody() +
+                        " | isMe: " + chatMessage.isMe() +
+                        " | date: " + chatMessage.getDate() +
+                        " | messageBodyTranslated: " + chatMessage.getBodyTranslated());*/
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+        return chatMessage;
+    }
+
+
+    @Override
+    public List<String> findContactsFromActiveChats() {
+        ArrayList<String> contactsFromActiveChatsList = new ArrayList<String>();
+        Cursor cursor = db.
+                rawQuery("SELECT DISTINCT (contact) FROM chatMessages", null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Log.d(TAG, "[findContactsFromActiveChats] contact: " + cursor.getString(0) );
+            contactsFromActiveChatsList.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        return contactsFromActiveChatsList;
+    }
+
+    private ChatMessage cursorToChatMessage(Cursor cursor) {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setReceiver(cursor.getString(1));
         chatMessage.setBody(cursor.getString(2));

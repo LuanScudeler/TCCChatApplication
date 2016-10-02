@@ -22,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jxmpp.util.XmppStringUtils;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +45,6 @@ import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.RestFacade;
 import br.chatup.tcc.utils.Util;
 
-//TODO: Retrieve chat history when loading chatActivity
 public class ChatActivity extends AppCompatActivity {
 
     private static final String TAG = Constants.LOG_TAG + ChatActivity.class.getSimpleName();
@@ -196,7 +194,7 @@ public class ChatActivity extends AppCompatActivity {
     private void initChatData() {
         //Retrieves chat history
         List<ChatMessage> chatMessageList;
-        chatMessageList = db.findAllByContact(XmppStringUtils.parseLocalpart(contactJID));
+        chatMessageList = db.findAllByContactJID(XmppStringUtils.parseLocalpart(contactJID));
         for (ChatMessage chatMessage : chatMessageList) {
             chatContainerAdapter.add(chatMessage);
         }

@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtPassword;
     private Button btnLogin;
     private ProgressDialog pDialog;
-    private XmppManager xmppManager;
 
     private static final String TAG = Util.getTagForClass(LoginActivity.class);
 

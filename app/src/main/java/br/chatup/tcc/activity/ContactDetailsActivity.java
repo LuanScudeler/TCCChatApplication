@@ -18,12 +18,10 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.roster.Roster;
 import org.jxmpp.util.XmppStringUtils;
-import org.w3c.dom.Text;
 
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.myapplication.R;
 import br.chatup.tcc.service.LocalBinder;
-import br.chatup.tcc.service.MessageService;
 import br.chatup.tcc.service.XmppService;
 import br.chatup.tcc.utils.Constants;
 import br.chatup.tcc.utils.JsonParser;
@@ -38,8 +36,6 @@ public class ContactDetailsActivity extends AppCompatActivity {
     private Button btnAddContact;
     private User contactSelected;
     private static boolean serviceConnected;
-    private boolean created;
-    private boolean connected;
     private static XmppService xmppService;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override

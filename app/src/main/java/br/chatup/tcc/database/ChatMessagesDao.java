@@ -9,5 +9,7 @@ import br.chatup.tcc.bean.ChatMessage;
  */
 public interface ChatMessagesDao {
     void insert(ChatMessage chatMessage);
-    List<ChatMessage> findAllByContact(String contact);
+    List<ChatMessage> findAllByContactJID(String contactJID);
+    ChatMessage findLastOneByContactJID(String contactJID);
+    List<String> findContactsFromActiveChats();
 }
