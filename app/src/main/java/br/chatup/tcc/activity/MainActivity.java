@@ -14,9 +14,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.chatup.tcc.adapters.ActiveChatsListAdapter;
-import br.chatup.tcc.adapters.ContactsListAdapter;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.bean.User;
 import br.chatup.tcc.cache.CacheStorage;
@@ -131,8 +132,21 @@ public class MainActivity extends AppCompatActivity
         App.setCurrentActivity(this);
         db = new AppDataSource(this);
 
-        txtUsernameNavHeader = (TextView) findViewById(R.id.txtUsername_NavHeader);
-        txtEmailNavHeader = (TextView) findViewById(R.id.txtEmail_NavHeader);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        View header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        navigationView.addHeaderView(header);
+
+        txtUsernameNavHeader = (TextView) header.findViewById(R.id.txtUsername_NavHeader);
+        txtEmailNavHeader = (TextView) header.findViewById(R.id.txtEmail_NavHeader);
 
         try {
             user = CacheStorage.getActiveUser(this);
@@ -159,16 +173,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             backToLogin();
         }
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     public void initActiveChats() {
