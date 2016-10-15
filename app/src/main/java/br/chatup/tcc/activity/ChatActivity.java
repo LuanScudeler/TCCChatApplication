@@ -301,7 +301,7 @@ public class ChatActivity extends AppCompatActivity {
         if (success) {
             //"contact" in database must be only de username portion of the JID
             chatMessage.setReceiver(XmppStringUtils.parseLocalpart(chatMessage.getReceiver()));
-            db.insert(chatMessage);
+            db.insertChatMsg(chatMessage);
         }
     }
 }

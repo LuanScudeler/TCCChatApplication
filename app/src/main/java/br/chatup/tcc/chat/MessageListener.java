@@ -16,7 +16,6 @@ import org.jxmpp.util.XmppStringUtils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import br.chatup.tcc.activity.ChatActivity;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.utils.App;
@@ -82,7 +81,7 @@ public class MessageListener implements ChatMessageListener, ChatStateListener  
                     false,
                     time,
                     message.getBody());
-            db.insert(storableChatMessage);
+            db.insertChatMsg(storableChatMessage);
         }
     }
 }

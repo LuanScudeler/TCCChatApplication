@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = Util.getTagForClass(MainActivity.class);
+    private static final String TRANSLATION_MODE_DEFAULT_VAL = "0";
     private TextView txtUsernameNavHeader;
     private TextView txtEmailNavHeader;
     private ActiveChatsListAdapter customAdapter;
@@ -129,8 +130,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        App.setCurrentActivity(this);
-        db = new AppDataSource(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -148,6 +147,10 @@ public class MainActivity extends AppCompatActivity
         txtUsernameNavHeader = (TextView) header.findViewById(R.id.txtUsername_NavHeader);
         txtEmailNavHeader = (TextView) header.findViewById(R.id.txtEmail_NavHeader);
 
+
+        App.setCurrentActivity(this);
+        db = new AppDataSource(this);
+
         try {
             user = CacheStorage.getActiveUser(this);
 
@@ -156,6 +159,7 @@ public class MainActivity extends AppCompatActivity
                 txtUsernameNavHeader.setText(user.getUsername());
                 txtEmailNavHeader.setText(user.getEmail());
 
+                initUserPreferences();
                 initActiveChats();
 
                 xmppServiceIntent = new Intent(getBaseContext(), XmppService.class);
@@ -172,6 +176,19 @@ public class MainActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
             backToLogin();
+        }
+    }
+
+    private void initUserPreferences() {
+
+        //Init translationMode preference
+        int currTranslationModeValue = db.findTranslationMode("translationMode");
+        if (currTranslationModeValue == -1) {
+            Log.d(TAG, "Initiating translationMode preferences...");
+            db.insertPreference("translationMode", TRANSLATION_MODE_DEFAULT_VAL);
+            App.setTranslationEnabled(false);
+        } else {
+            App.setTranslationEnabled(currTranslationModeValue!=0);
         }
     }
 

@@ -12,12 +12,7 @@ import java.util.List;
 import br.chatup.tcc.bean.ChatMessage;
 import br.chatup.tcc.utils.Constants;
 
-import static br.chatup.tcc.database.DataBaseHelper.COLUMN_CONTACT;
-import static br.chatup.tcc.database.DataBaseHelper.COLUMN_DATE;
-import static br.chatup.tcc.database.DataBaseHelper.COLUMN_IS_ME;
-import static br.chatup.tcc.database.DataBaseHelper.COLUMN_MSG_BODY;
-import static br.chatup.tcc.database.DataBaseHelper.COLUMN_MSG_BODY_TRANSLATED;
-import static br.chatup.tcc.database.DataBaseHelper.TABLE_CHAT_MESSAGES;
+import static br.chatup.tcc.database.DataBaseHelper.*;
 
 /**
  * Created by Luan on 9/3/2016.
@@ -32,7 +27,7 @@ public class AppDataSource implements ChatMessagesDao {
     }
 
     @Override
-    public void insert(ChatMessage chatMessage) {
+    public void insertChatMsg(ChatMessage chatMessage) {
         ContentValues v = new ContentValues();
         v.put(COLUMN_CONTACT, chatMessage.getReceiver());
         v.put(COLUMN_MSG_BODY, chatMessage.getBody());
@@ -41,6 +36,24 @@ public class AppDataSource implements ChatMessagesDao {
         v.put(COLUMN_MSG_BODY_TRANSLATED, chatMessage.getBodyTranslated());
 
         db.insert(TABLE_CHAT_MESSAGES, null, v);
+    }
+
+    @Override
+    public void insertPreference(String prefType, String prefValue) {
+        ContentValues v = new ContentValues();
+        v.put(COLUMN_PROPERTY, prefType);
+        v.put(COLUMN_PROPERTY_VALUE, prefValue);
+
+        db.insert(TABLE_USER_PREFERENCES, null, v);
+    }
+
+    @Override
+    public void updatePreference(String prefType, String prefValue) {
+        ContentValues v = new ContentValues();
+        v.put(COLUMN_PROPERTY, prefType);
+        v.put(COLUMN_PROPERTY_VALUE, prefValue);
+
+        db.update(TABLE_USER_PREFERENCES, v, "property='translationMode'", null);
     }
 
     @Override
@@ -105,6 +118,27 @@ public class AppDataSource implements ChatMessagesDao {
         cursor.close();
 
         return contactsFromActiveChatsList;
+    }
+
+    @Override
+    public int findTranslationMode(String property) {
+        int isTranslationMode = 0;
+        Cursor cursor = null;
+
+        try{
+            cursor = db.rawQuery("SELECT * FROM userPreferences WHERE property = ?", new String[]{property});
+        } catch (IllegalArgumentException argEx){
+            Log.d(TAG, "User translationMode preference has not been created! -> " + argEx.getMessage());
+            return -1;
+        }
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            isTranslationMode = new Integer(cursor.getString(2));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        return isTranslationMode;
     }
 
     private ChatMessage cursorToChatMessage(Cursor cursor) {
