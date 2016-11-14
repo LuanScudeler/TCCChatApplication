@@ -68,12 +68,12 @@ public class XmppManager extends App {
     };
 
     //TODO: Test this better
-    {
+/*    {
         Log.d(TAG, "Bind to service");
         Log.d(TAG, "[CurrentActivity]: " + App.getCurrentActivity().getLocalClassName());
         xmppServiceIntent = new Intent(App.getCurrentActivity(), XmppService.class);
         App.getCurrentActivity().bindService(xmppServiceIntent, mConnection, 0);
-    }
+    }*/
 
     public XmppManager(User user) {
         this.user = user;

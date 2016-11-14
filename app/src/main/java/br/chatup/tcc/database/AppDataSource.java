@@ -27,6 +27,12 @@ public class AppDataSource implements ChatMessagesDao {
     }
 
     @Override
+    public void deleteUserInfo() {
+        db.delete(TABLE_CHAT_MESSAGES, null, null);
+        db.delete(TABLE_USER_PREFERENCES, null, null);
+    }
+
+    @Override
     public void insertChatMsg(ChatMessage chatMessage) {
         ContentValues v = new ContentValues();
         v.put(COLUMN_CONTACT, chatMessage.getReceiver());

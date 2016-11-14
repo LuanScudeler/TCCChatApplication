@@ -19,6 +19,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jxmpp.util.XmppStringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,6 +85,7 @@ public class ContactsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent(getBaseContext(), SearchContactActivity.class);
                 startActivity(i);
+                finish();
             }
         });
     }
@@ -147,17 +149,15 @@ public class ContactsActivity extends AppCompatActivity {
             Roster roster = Roster.getInstanceFor(xmppService.getXmppManager().getConn());
             startRosterPresenceListener(roster);
 
-            //Add a roster to the current user for testing purposes
-            //String userJID = "luan@10.172.32.71";
-            //String nickName = "luan";
-            //addUserForTest(roster, userJID, nickName);
             entriesList = new ArrayList<RosterEntry>();
             //Get all rosters
             Collection<RosterEntry> entries = roster.getEntries();
             entriesList.addAll(entries);
 
             for (RosterEntry entry : entriesList) {
-                //Log.d(TAG, "Entry: JID: " + entry.getUser() + " Nickname: " + entry.getName());
+                if(entry.getName() == null || entry.getName().trim().isEmpty()) {
+                    //FIXME get contact name
+                }
             }
             //update the list
             runOnUiThread(new Runnable() {

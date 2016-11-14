@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import br.chatup.tcc.bean.User;
+import br.chatup.tcc.database.AppDataSource;
 import br.chatup.tcc.utils.JsonParser;
 import br.chatup.tcc.utils.Util;
 
@@ -79,6 +80,8 @@ public class CacheStorage {
         File activeUserFile  = new File(activeUserFilePath);
         try {
             if(activeUserFile.exists()) {
+                AppDataSource ads = new AppDataSource(activity);
+                ads.deleteUserInfo();
                 ret = activeUserFile.delete();
             }
         } catch(Exception e) {

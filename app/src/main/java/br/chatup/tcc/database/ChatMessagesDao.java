@@ -8,6 +8,7 @@ package br.chatup.tcc.database;
  * Created by Luan on 9/3/2016.
  */
 public interface ChatMessagesDao {
+    void deleteUserInfo();
     void insertChatMsg(ChatMessage chatMessage);
     void insertPreference(String prefType, String prefValue);
     void updatePreference(String prefType, String prefValue);

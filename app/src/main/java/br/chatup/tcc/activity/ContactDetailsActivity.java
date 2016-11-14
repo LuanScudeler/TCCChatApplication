@@ -141,6 +141,7 @@ public class ContactDetailsActivity extends AppCompatActivity {
             else {
                 Toast.makeText(ContactDetailsActivity.this, Util.getStringResource(ContactDetailsActivity.this, R.string.contact_added_successfully), Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(ContactDetailsActivity.this, ContactsActivity.class));
+                finish();
             }
         }
     }
