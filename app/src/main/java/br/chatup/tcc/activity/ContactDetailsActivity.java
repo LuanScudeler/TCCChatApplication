@@ -54,7 +54,7 @@ public class ContactDetailsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(!serviceConnected)
+        //if(!serviceConnected)
             bindService(new Intent(this, XmppService.class), mConnection, 0);
     }
 
@@ -62,9 +62,11 @@ public class ContactDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_details);
+
         txtUsername = (TextView) findViewById(R.id.txtUsername_ContactDetails);
         txtEmail = (TextView) findViewById(R.id.txtEmail_ContactDetails);
         btnAddContact = (Button) findViewById(R.id.btnAddContact_ContactDetails);
+
         btnAddContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,8 +87,8 @@ public class ContactDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        super.onStop();
         unbindService(mConnection);
+        super.onStop();
     }
 
     @Override

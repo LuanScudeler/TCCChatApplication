@@ -140,6 +140,7 @@ public class AppDataSource implements ChatMessagesDao {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             isTranslationMode = new Integer(cursor.getString(2));
+            Log.d(TAG, "isTranslationMode: " + isTranslationMode);
             cursor.moveToNext();
         }
         cursor.close();

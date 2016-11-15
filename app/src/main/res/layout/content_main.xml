@@ -20,5 +20,16 @@
         android:drawSelectorOnTop="false"
         android:layout_alignParentTop="true" />
 
+    <TextView
+        android:id="@+id/txtActiveChatsNotification"
+        android:text="@string/noActiveChatsFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
 
 </RelativeLayout>

@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TRANSLATION_MODE_DEFAULT_VAL = "0";
     private TextView txtUsernameNavHeader;
     private TextView txtEmailNavHeader;
+    private TextView txtActiveChatsNotification;
     private ActiveChatsListAdapter customAdapter;
     private ListView activeChatsListView;
     private ImageView imgViewUserPhoto;
@@ -98,6 +99,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+        App.setCurrentActivity(this);
         // Register to receive messages.
         // Registering an observer (mMessageReceiver) to receive Intents
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -147,8 +149,8 @@ public class MainActivity extends AppCompatActivity
         txtUsernameNavHeader = (TextView) header.findViewById(R.id.txtUsername_NavHeader);
         txtEmailNavHeader = (TextView) header.findViewById(R.id.txtEmail_NavHeader);
 
+        txtActiveChatsNotification = (TextView) findViewById(R.id.txtActiveChatsNotification);
 
-        App.setCurrentActivity(this);
         db = new AppDataSource(this);
 
         try {
@@ -195,6 +197,10 @@ public class MainActivity extends AppCompatActivity
     public void initActiveChats() {
         contactsFromActiveChatsList = db.findContactsFromActiveChats();
 
+        if (contactsFromActiveChatsList.isEmpty()) {
+            txtActiveChatsNotification.setVisibility(View.VISIBLE);
+        }
+
         activeChatsListView = (ListView) findViewById(R.id.lvActiveChats);
         customAdapter = new ActiveChatsListAdapter(MainActivity.this,
                 R.layout.active_chats_list_item,
@@ -203,6 +209,7 @@ public class MainActivity extends AppCompatActivity
         activeChatsListView.setOnItemClickListener(openChatActivity());
         ((ArrayAdapter) activeChatsListView.getAdapter()).notifyDataSetChanged();
     }
+
     public void backToLogin() {
         Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);

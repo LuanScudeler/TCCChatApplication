@@ -142,7 +142,6 @@ public class ChatActivity extends AppCompatActivity {
     private void clearReferences() {
         Activity currActivity = App.getCurrentActivity();
         if (this.equals(currActivity) && currActiveChat.equals(App.getCurrentActiveChat())) {
-            App.setCurrentActivity(null);
             App.setCurrentActiveChat(null);
         }
     }

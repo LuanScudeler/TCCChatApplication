@@ -147,7 +147,8 @@ public class ContactsActivity extends AppCompatActivity {
             Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
             Roster roster = Roster.getInstanceFor(xmppService.getXmppManager().getConn());
-            startRosterPresenceListener(roster);
+            //TODO: rosterListener currently deactivated to avoid problems. Must have only one start somewhere when initializing connection with server
+            //startRosterPresenceListener(roster);
 
             entriesList = new ArrayList<RosterEntry>();
             //Get all rosters
@@ -156,7 +157,7 @@ public class ContactsActivity extends AppCompatActivity {
 
             for (RosterEntry entry : entriesList) {
                 if(entry.getName() == null || entry.getName().trim().isEmpty()) {
-                    //FIXME get contact name
+                    //FIXME contact name is not being persisted in the server. Problem must be fixed when adding a contact
                 }
             }
             //update the list

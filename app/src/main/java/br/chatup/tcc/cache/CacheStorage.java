@@ -80,8 +80,11 @@ public class CacheStorage {
         File activeUserFile  = new File(activeUserFilePath);
         try {
             if(activeUserFile.exists()) {
-                AppDataSource ads = new AppDataSource(activity);
-                ads.deleteUserInfo();
+                /*Makes sense delete users from cache but not his conversations and preferences.
+                * if he wants to logout for login with another account and them come back to his original
+                * or just if he just wants to disconnect from the server*/
+                //AppDataSource ads = new AppDataSource(activity);
+                //ads.deleteUserInfo();
                 ret = activeUserFile.delete();
             }
         } catch(Exception e) {

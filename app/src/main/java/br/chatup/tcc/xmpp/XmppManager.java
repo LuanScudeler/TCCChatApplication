@@ -11,6 +11,8 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -53,12 +55,15 @@ public class XmppManager extends App {
     private Activity currActivity;
     private ProgressDialog pDialog;
     private AlertDialog alert;
+    private static boolean serviceConnected;
     private Intent xmppServiceIntent;
     private static XmppService xmppService;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             xmppService = ((LocalBinder<XmppService>) iBinder).getService();
+            Log.d(TAG, "BINDED TO SERVER");
+            serviceConnected = true;
         }
 
         @Override
@@ -67,13 +72,14 @@ public class XmppManager extends App {
         }
     };
 
-    //TODO: Test this better
-/*    {
+    //Bind to service for stopping XmppService on BackToLogin() method in case a connection error occurs
+    //TODO: Currently this is throwing service leak exception because LoginActivity is closed without unbind from service, BUT it doesn't affect the users
+    {
         Log.d(TAG, "Bind to service");
         Log.d(TAG, "[CurrentActivity]: " + App.getCurrentActivity().getLocalClassName());
         xmppServiceIntent = new Intent(App.getCurrentActivity(), XmppService.class);
         App.getCurrentActivity().bindService(xmppServiceIntent, mConnection, 0);
-    }*/
+    }
 
     public XmppManager(User user) {
         this.user = user;
@@ -160,7 +166,7 @@ public class XmppManager extends App {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         alert.dismiss();
-                        backToLogin();
+                        stopResourcesAndBackToLogin();
                     }
                 });
         alert = builder.create();
@@ -168,6 +174,13 @@ public class XmppManager extends App {
     }
 
     public void backToLogin() {
+        Intent i = new Intent(App.getCurrentActivity(), LoginActivity.class);
+
+        App.getCurrentActivity().startActivity(i);
+        App.getCurrentActivity().finish();
+    }
+
+    public void stopResourcesAndBackToLogin() {
         xmppService.stopSelf();
 
         Intent i = new Intent(App.getCurrentActivity(), LoginActivity.class);
@@ -214,7 +227,15 @@ public class XmppManager extends App {
                 if(result!=null){
                     pDialog.cancel();
                     Log.i(TAG, "Fail on logging");
-                    Toast.makeText(currActivity, currActivity.getResources().getString(R.string.login_failed), Toast.LENGTH_SHORT).show();
+                    Toast toast = Toast.makeText(currActivity, currActivity.getResources().getString(R.string.login_failed), Toast.LENGTH_LONG);
+
+                    //Centralize message
+                    TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                    if( v != null) v.setGravity(Gravity.CENTER);
+
+                    toast.show();
+
+                    backToLogin();
                 }else{
                     XMPPRetrievingUserDataTask xmppTask = new XMPPRetrievingUserDataTask();
                     xmppTask.execute(user);
