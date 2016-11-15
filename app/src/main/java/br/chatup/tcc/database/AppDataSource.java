@@ -131,19 +131,20 @@ public class AppDataSource implements ChatMessagesDao {
         int isTranslationMode = 0;
         Cursor cursor = null;
 
-        try{
-            cursor = db.rawQuery("SELECT * FROM userPreferences WHERE property = ?", new String[]{property});
-        } catch (IllegalArgumentException argEx){
-            Log.d(TAG, "User translationMode preference has not been created! -> " + argEx.getMessage());
+        cursor = db.rawQuery("SELECT * FROM userPreferences WHERE property = ?", new String[]{property});
+
+        if(cursor!=null && cursor.getCount()>0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                isTranslationMode = new Integer(cursor.getString(2));
+                Log.d(TAG, "isTranslationMode: " + isTranslationMode);
+                cursor.moveToNext();
+            }
+            cursor.close();
+        } else {
+            Log.d(TAG, "User translationMode preference has not been created!");
             return -1;
         }
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            isTranslationMode = new Integer(cursor.getString(2));
-            Log.d(TAG, "isTranslationMode: " + isTranslationMode);
-            cursor.moveToNext();
-        }
-        cursor.close();
 
         return isTranslationMode;
     }

@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity
 
         //Init translationMode preference
         int currTranslationModeValue = db.findTranslationMode("translationMode");
+        Log.d(TAG, "[currTranslationModeValue] Query result:" + currTranslationModeValue);
         if (currTranslationModeValue == -1) {
             Log.d(TAG, "Initiating translationMode preferences...");
             db.insertPreference("translationMode", TRANSLATION_MODE_DEFAULT_VAL);
