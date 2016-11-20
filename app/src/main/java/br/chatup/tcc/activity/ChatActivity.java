@@ -53,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton btnSendMessage;
     private Chat newChat;
     private ChatMessage chatMessage;
+    private String messageBody;
     private ChatContainerAdapter chatContainerAdapter;
     private AppDataSource db;
 
@@ -223,7 +224,7 @@ public class ChatActivity extends AppCompatActivity {
     public void btnSendMessageClick(View v) {
         if (edtMessageBody.getText().toString().isEmpty()) return;
 
-        String messageBody = edtMessageBody.getText().toString();
+        messageBody = edtMessageBody.getText().toString();
         String time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
         chatMessage = new ChatMessage(messageBody, contactJID, true, time, messageBody);
 
@@ -284,7 +285,8 @@ public class ChatActivity extends AppCompatActivity {
             }.execute(edtMessageBody.getText().toString());
         } else {
             Log.d(TAG, "[Translation skipped] Users have the same language");
-            sendMessage(edtMessageBody.getText().toString(), edtMessageBody.getText().toString());
+            edtMessageBody.setText("");
+            sendMessage(messageBody, messageBody);
         }
     }
 

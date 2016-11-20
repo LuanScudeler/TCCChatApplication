@@ -35,7 +35,7 @@
     <!-- MainActivity -->
     <string name="exit">Sair</string>
     <string name="backup">Backup</string>
-    <string name="noActiveChatsFound">Essa é a sua lista de conversas.\nVocê ainda não inciou nenhuma.\nPara inicar uma conversa vá para a sua lista de contatos e escolha alguem para conversar!</string>
+    <string name="noActiveChatsFound">Essa é a sua lista de conversas.\nPara inicar uma conversa vá para a sua lista de contatos e escolha alguem para conversar!</string>
 
     <!-- RegisterActivity -->
     <string name="sorry_an_error_occured">Desculpe, um erro ocorreu. \nVerifique sua conexão e tente novamente</string>
