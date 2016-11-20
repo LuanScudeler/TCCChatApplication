@@ -10,7 +10,8 @@
 
     <!-- Globals -->
     <string name="conn_to_srv">Conectando...</string>
-    <string name="please_wait">Por Favor Aguarde...</string>
+    <string name="please_wait">Por favor aguarde...</string>
+    <string name="retrieving_data">Buscando seus dados...</string>
     <string name="confirm">Confirmar</string>
     <string name="search">Buscar</string>
     <string name="add_to_contacts">Adicionar aos contatos</string>
