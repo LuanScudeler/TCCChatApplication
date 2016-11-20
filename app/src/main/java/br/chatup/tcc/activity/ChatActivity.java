@@ -91,8 +91,10 @@ public class ChatActivity extends AppCompatActivity {
         Log.d(TAG, "[BroadcastReceiver] Message received | From: " + message.getReceiver() + " | Body: " + message.getBody());
 
         String senderUsername = XmppStringUtils.parseLocalpart(message.getReceiver());
-        if (senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID)))
+        if (senderUsername.equals(XmppStringUtils.parseLocalpart(contactJID))) {
             displayMessage(message);
+            Util.onlySoundNotification(getApplicationContext());
+        }
         else {
             Log.d(TAG, "[BroadcastReceiver] Raising notification");
             //For communication to work when opening a chat contactJid must be in bareJid format
@@ -172,7 +174,14 @@ public class ChatActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
-                ResponseEntity<String> resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJID.split("@")[0]));
+                ResponseEntity<String> resp = null;
+
+                resp = RestFacade.get(String.format(Constants.RESTAPI_USER_URL, contactJID.split("@")[0]));
+
+                if (resp == null) {
+                    Util.backToLogin();
+                }
+
                 User u = br.chatup.tcc.utils.JsonParser.fromJson(User.class, resp.getBody());
                 Log.i(TAG, "Retrieved receptor properties: " + u.getProperties().get("property").getValue());
                 return u.getProperties().get("property").getValue();

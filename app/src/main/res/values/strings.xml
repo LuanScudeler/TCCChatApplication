@@ -39,7 +39,7 @@
     <string name="exit">Exit</string>
     <string name="backup">Backup</string>
     <string name="activeChats">Meazer</string>
-    <string name="noActiveChatsFound">This is the list of your current chats.\nYou didn\'t started any chat yet.\nYou can go to your contact list and start chatting with them!</string>
+    <string name="noActiveChatsFound">This your current chats list.\nYou didn\'t started any chat yet.\nYou can go to your contact list and start chatting with them!</string>
 
 
     <!-- ContactsActivity -->

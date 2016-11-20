@@ -10,6 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
 
@@ -17,6 +20,7 @@ import org.jxmpp.util.XmppStringUtils;
 
 import java.nio.charset.Charset;
 
+import br.chatup.tcc.activity.LoginActivity;
 import br.chatup.tcc.myapplication.R;
 
 /**
@@ -67,6 +71,13 @@ public class Util {
         return false;
     }
 
+    public static void backToLogin() {
+        Intent i = new Intent(App.getCurrentActivity(), LoginActivity.class);
+
+        App.getCurrentActivity().startActivity(i);
+        App.getCurrentActivity().finish();
+    }
+
     public static void showNotification(Context ct, Class<?> clazz, String contactJID ,String msgBody){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ct)
                 .setSmallIcon(R.drawable.notification_icon_mdpi)
@@ -98,8 +109,16 @@ public class Util {
         // Configure
         Notification n = mBuilder.build();
         n.vibrate = new long[]{150, 300, 150, 600};
+        n.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
 
         // First parameter refers to notification id, notification can be modified later
         mNotificationManager.notify(R.drawable.notification_icon_mdpi, n);
+    }
+
+    public static void onlySoundNotification(Context ct) {
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone r = RingtoneManager.getRingtone(ct, notification);
+        r.play();
     }
 }
